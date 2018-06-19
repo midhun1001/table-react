@@ -1,0 +1,111 @@
+* {
+  box-sizing: border-box;
+}
+button {
+  background: #00ACC1;
+  color: #fff;
+  border: 1px solid #00ACC1;
+  box-shadow: 0 0 1px #00ACC1;
+  padding: 15px;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-block;
+}
+button:focus {
+  outline: none;
+}
+button:hover {
+  box-shadow: 0 0 5px #00ACC1;
+  transform: scale(1.005);
+}
+.spreadsheet {
+  color: #252525;
+  &__copy {
+    text-align: right;
+    width: 100%;
+  }
+  &__table {
+    &-dir {
+      width: 100%;
+      padding: 10px 0;
+    }
+    &-prev {
+      width: 45%;
+    }
+    &-next {
+      width: 45%;
+    }
+    &-pageno {
+      width: 10%;
+      display: inline-block;
+      input {
+        width: 100%;
+        border: 1px solid #f1f1f1;
+        box-shadow: 0 0 1px #f1f1f1;
+        padding: 15px 0px;
+        font-size: 15px;
+        color: #605b5b;
+        text-align: center;
+      }
+      input:focus {
+        outline: none;
+      }
+    }
+  }
+}
+.exl__table {
+  border-collapse: collapse;
+  border: 1px solid;
+  border-radius: 5px;
+  width: 100%;
+  height: 100%;
+  tr td {
+    border: 1px solid #d5d5d5;
+    padding: 15px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  tr th {
+    background: #00ACC1;
+    border: 1px solid #d5d5d5;
+    color: #fff;
+    text-align: left;
+    padding: 15px;
+  }
+  tr:hover {
+    cursor: pointer;
+  }
+}
+.select-all {
+  margin-right: 15px;
+}
+.select-all, .de-select {
+  padding: 5px 15px;
+  margin: 0 0 15px 15px;
+}
+.select-all:focus, .de-select:focus {
+  outline: none;
+}
+.alert {
+  position: fixed;
+  background: #fff;
+  top: 5%;
+  right: 5%;
+  -webkit-box-shadow: 0px 2px 35px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 2px 35px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 2px 35px 0px rgba(0,0,0,0.75);
+  padding: 25px;
+  color: #252525;
+  z-index: 1000;
+  border-radius: 5px;
+  font-size: 15px;
+}
+.nodata {
+  text-align: center;
+  color: #ff5a5a;
+  font-size: 20px;
+}
