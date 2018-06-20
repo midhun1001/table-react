@@ -9,23 +9,11 @@ class Table extends Component {
     this.state = {
       list: this.props.list ? this.props.list : [],
       headers: this.props.headers ? this.props.headers : [],
-      alert: false,
       start: false,
       pageno: 1,
       pageCountProp: this.props.pageCount ? this.props.pageCount : 10,
       startcount: 0,
       count: this.props.pageCount ? this.props.pageCount : 10
-    };
-    this.alertRef = React.createRef();
-    this.hideAlert = () => {
-      let i = 1;
-      const alertFade = setInterval(() => {
-        i -= 0.1;
-        if (i < 0) {
-          clearInterval(alertFade);
-          this.setState({ alert: false });
-        }
-      }, 100);
     };
     this.startMultiselect = (e) => {
       if (e.target.parentNode.style.background) {
@@ -58,7 +46,7 @@ class Table extends Component {
     };
     this.deselect = () => {
       copy(this.selectRows());
-      this.setState({ alert: true, start: false });
+      this.setState({ start: false });
     };
     this.toggleAllSelect = (flag) => {
       let copyText = '';
@@ -75,6 +63,19 @@ class Table extends Component {
       }
       copy(copyText);
     };
+    this.contentEdit = (e, param) => {
+      e.persist();
+      if (param === 'hide') {
+        e.target.contentEditable = false;
+      } else {
+        e.target.contentEditable = true;
+        setTimeout(() => {
+          if (document.activeElement !== e.target) {
+            e.target.contentEditable = false;
+          }
+        }, 300);
+      }
+    };
     this.renderList = () => (
       this.state.list.map((val, index) => {
         if ((index >= this.state.startcount) && (index < this.state.count)) {
@@ -87,7 +88,13 @@ class Table extends Component {
             >
               {
                 this.state.headers.map((headers, i) => (
-                  <td key={i}>{val[headers.mapKey]}</td>
+                  <td
+                    key={i}
+                    onClick={this.contentEdit}
+                    onBlur={(e) => this.contentEdit(e, 'hide')}
+                  >
+                    {val[headers.mapKey]}
+                  </td>
                 ))
               }
             </tr>
@@ -168,17 +175,6 @@ class Table extends Component {
             <p className="nodata">No Data</p>
           }
         </div>
-        {
-          this.state.alert &&
-          <div ref={this.alertRef} className="alert">
-            <div className="alert__box">
-              <div className="alert__msg">
-                Text copied to clipboard as comma seperated data
-              </div>
-            </div>
-            { this.hideAlert() }
-          </div>
-        }
         <div className="spreadsheet__table-dir">
           <button className="spreadsheet__table-prev" onClick={(e) => this.changePage(e, 'prev')}>Prev</button>
           <span className="spreadsheet__table-pageno">
