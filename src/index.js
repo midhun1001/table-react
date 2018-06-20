@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import copy from 'clipboard-copy';
 import './index.scss';
 
@@ -199,12 +197,4 @@ Table.propTypes = {
   pageCount: PropTypes.number
 };
 
-axios.get('https://jsonplaceholder.typicode.com/photos')
-  .then((response) => {
-    if (response.data) {
-      ReactDOM.render(
-        <Table />,
-        document.getElementById('index'),
-      );
-    }
-  });
+export default Table;
