@@ -2,8 +2,8 @@
 
 <h4>Light weight simple react table from where you can copy the rows from table and paste directly into Excel sheet as csv data.</h4>
 
-<p>npm install customizable-dropdown-react</p>
-<p>yarn add customizable-dropdown-react</p>
+<p>npm install react-table-spreadsheet</p>
+<p>yarn add react-table-spreadsheet</p>
 
 ```html
 import Table "react-table-spreadsheet";
