@@ -210,6 +210,7 @@ class Table extends Component {
                 <button
                   className="csv__export-btn sheet-btn"
                   onClick={this.fnExcelReport}
+                  style={this.btnStyles()}
                 >
                   Download Full Table as CSV
                 </button>
