@@ -82,7 +82,7 @@ import Table "react-table-spreadsheet";
             .headerStyle {
               tr {
                 background: #E57373;
-                td {
+                th {
                   padding: 5px 10px
                 }
               }
