@@ -150,6 +150,3 @@ import Table "react-table-spreadsheet";
     </tr>
   </tbody>
 </table>
-
-<h3>Copy Table rows</h3>
-<p>Click on table rows which needs to copy as comma seperated values. Also, you can select/deselect whole table page.</p>
