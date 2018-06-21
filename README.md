@@ -25,7 +25,7 @@ import Table "react-table-spreadsheet";
     <tr>
       <td>list</td>
       <td>
-        <p><strong>Mandatory</strong></p>
+        <p><strong>Mandatory. Type: Array object</strong></p>
         <pre>
          [
           {
@@ -45,14 +45,14 @@ import Table "react-table-spreadsheet";
     <tr>
       <td>pageCount</td>
       <td>
-        <p><strong>Optional</strong></p>
+        <p><strong>Optional. Type: Number</strong></p>
         Value can be any number. Default value is 10
       </td>
     </tr>
     <tr>
       <td>headers</td>
       <td>
-        <p><strong>Mandatory</strong></p>
+        <p><strong>Mandatory. Type: Array object</strong></p>
         <pre>
           [{
               headerName: 'Id',
@@ -73,7 +73,7 @@ import Table "react-table-spreadsheet";
     <tr>
       <td>theadStyle</td>
       <td>
-          <p><strong>Optional</strong></p>
+          <p><strong>Optional. Type: String</strong></p>
           <p>
             Pass the className to alter the styles of thead
           </p>
@@ -93,7 +93,7 @@ import Table "react-table-spreadsheet";
     <tr>
       <td>tbodyStyle</td>
       <td>
-          <p><strong>Optional</strong></p>
+          <p><strong>Optional. Type: String</strong></p>
           <p>
             Pass the className to alter the styles of tbody
           </p>
@@ -114,9 +114,37 @@ import Table "react-table-spreadsheet";
     <tr>
       <td>btnBg</td>
       <td>
-          <p><strong>Optional</strong></p>
+          <p><strong>Optional. Type: String</strong></p>
           <p>
-            Pass the color to change the colo of the buttons
+            Pass the color to change the color of the buttons
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>csv</td>
+      <td>
+          <p><strong>Optional. Type: Boolean</strong></p>
+          <p>
+            To enable the functionality download as csv file and to activate copy the rows in csv format
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>editable</td>
+      <td>
+          <p><strong>Optional. Type: Boolean</strong></p>
+          <p>
+            To enable the content editable functionality
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>edited</td>
+      <td>
+          <p><strong>Optional. Type: Function</strong></p>
+          <p>
+            Callback function to get the editable row data in json format.
+            <strong>Note: editable prop should be true</strong>
           </p>
       </td>
     </tr>

@@ -14,7 +14,7 @@
 .sheet-btn:focus {
   outline: none;
 }
-.sheet-btn:hover {
+.sheet-btn:hover,.sheet-btn:focus {
   transform: scale(1.005);
 }
 .spreadsheet {
@@ -83,6 +83,9 @@
         -ms-user-select: none;
         user-select: none;
       }
+      td:focus {
+        outline: none;
+      }
     }
     tr:hover {
       cursor: pointer;
@@ -95,7 +98,7 @@
 .select-all {
   margin-right: 15px;
 }
-.select-all, .de-select {
+.select-all, .de-select, .csv__export-btn {
   padding: 5px 15px;
   margin: 0 0 15px 15px;
 }
