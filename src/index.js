@@ -15,6 +15,13 @@ class Table extends Component {
       startcount: 0,
       count: this.props.pageCount ? this.props.pageCount : 10
     };
+    this.btnStyles = () => {
+      const btnstyles = this.props.btnBg ? this.props.btnBg : '';
+      return {
+        backgroundColor: btnstyles,
+        borderColor: btnstyles
+      };
+    };
     this.startMultiselect = (e) => {
       if (e.target.parentNode.style.background) {
         e.target.parentNode.style.background = '';
@@ -141,21 +148,45 @@ class Table extends Component {
     return (
       <div className="spreadsheet">
         <div className="spreadsheet__copy">
-          <button onClick={() => this.toggleAllSelect('select')} className="select-all">Copy all rows of page</button>
-          <button onClick={() => this.toggleAllSelect('clear')} className="de-select">De-select All</button>
+          <button
+            onClick={() => this.toggleAllSelect('select')}
+            className="select-all sheet-btn"
+            style={this.btnStyles()}
+          >
+            Copy all rows of page
+          </button>
+          <button
+            onClick={() => this.toggleAllSelect('clear')}
+            className="de-select sheet-btn"
+            style={this.btnStyles()}
+          >
+            De-select All
+          </button>
         </div>
         <div className="spreadsheet__table">
           <div className="spreadsheet__table-dir">
-            <button className="spreadsheet__table-prev" onClick={(e) => this.changePage(e, 'prev')}>Prev</button>
+            <button
+              className="spreadsheet__table-prev sheet-btn"
+              onClick={(e) => this.changePage(e, 'prev')}
+              style={this.btnStyles()}
+            >
+              Prev
+            </button>
             <span className="spreadsheet__table-pageno">
               <input type="number" onChange={(e) => this.changePage(e, null)} value={this.state.pageno} />
             </span>
-            <button className="spreadsheet__table-next" onClick={(e) => this.changePage(e, 'next')}>Next</button>
+            <button
+              className="spreadsheet__table-next sheet-btn"
+              onClick={(e) => this.changePage(e, 'next')}
+              style={this.btnStyles()}
+            >
+              Next
+            </button>
           </div>
           {
             this.state.list.length > 0 &&
             <table className="exl__table">
-              <thead>
+              <thead className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}>
                 <tr>
                   {
                     (this.state.headers.length > 0) &&
@@ -165,7 +196,7 @@ class Table extends Component {
                   }
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}>
                 { this.renderList() }
               </tbody>
             </table>
@@ -176,11 +207,23 @@ class Table extends Component {
           }
         </div>
         <div className="spreadsheet__table-dir">
-          <button className="spreadsheet__table-prev" onClick={(e) => this.changePage(e, 'prev')}>Prev</button>
+          <button
+            className="spreadsheet__table-prev sheet-btn"
+            onClick={(e) => this.changePage(e, 'prev')}
+            style={this.btnStyles()}
+          >
+            Prev
+          </button>
           <span className="spreadsheet__table-pageno">
             <input type="number" onChange={(e) => this.changePage(e, null)} value={this.state.pageno} />
           </span>
-          <button className="spreadsheet__table-next" onClick={(e) => this.changePage(e, 'next')}>Next</button>
+          <button
+            className="spreadsheet__table-next sheet-btn"
+            onClick={(e) => this.changePage(e, 'next')}
+            style={this.btnStyles()}
+          >
+            Next
+          </button>
         </div>
       </div>
     );
@@ -190,7 +233,10 @@ class Table extends Component {
 Table.propTypes = {
   list: PropTypes.array,
   headers: PropTypes.array,
-  pageCount: PropTypes.number
+  pageCount: PropTypes.number,
+  theadStyle: PropTypes.string,
+  tbodyStyle: PropTypes.string,
+  btnBg: PropTypes.string
 };
 
 export default Table;
