@@ -70,6 +70,56 @@ import Table "react-table-spreadsheet";
         </pre>
       </td>
     </tr>
+    <tr>
+      <td>theadStyle</td>
+      <td>
+          <p><strong>Optional</strong></p>
+          <p>
+            Pass the className to alter the styles of thead
+          </p>
+          <pre>
+            <strong>Example</strong>
+            .headerStyle {
+              tr {
+                background: #E57373;
+                td {
+                  padding: 5px 10px
+                }
+              }
+            }
+          </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>tbodyStyle</td>
+      <td>
+          <p><strong>Optional</strong></p>
+          <p>
+            Pass the className to alter the styles of tbody
+          </p>
+          <pre>
+            <strong>Example</strong>
+            .bodyStyle {
+              tr {
+                background: #8e8e8e;
+                color: #fff;
+                td {
+                  padding: 5px;
+                }
+              }
+            }
+          </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>btnBg</td>
+      <td>
+          <p><strong>Optional</strong></p>
+          <p>
+            Pass the color to change the colo of the buttons
+          </p>
+      </td>
+    </tr>
   </tbody>
 </table>
 
