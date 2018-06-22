@@ -19,6 +19,13 @@
 }
 .spreadsheet {
   color: #252525;
+  input[type="file"] {
+    display: none;
+  }
+  .table__wrapper {
+    min-height: .01%;
+    overflow-x: auto;
+  }
   &__copy {
     text-align: right;
     width: 100%;
@@ -57,7 +64,8 @@
   border: 1px solid;
   border-radius: 5px;
   width: 100%;
-  height: 100%;
+  max-width: 100%;
+  border-spacing: 0;
   &-thead {
     tr {
       background: #00ACC1;
@@ -65,7 +73,7 @@
       th {
         border: 1px solid #d5d5d5;
         text-align: left;
-        padding: 15px;
+        padding: 15px 7px;
       }
     }
   }
@@ -74,8 +82,8 @@
       color: #000;
       td {
         border: 1px solid #d5d5d5;
-        padding: 15px;
         position: relative;
+        padding: 7px;
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         -khtml-user-select: none;
@@ -123,18 +131,4 @@
   text-align: center;
   color: #ff5a5a;
   font-size: 20px;
-}
-.editable {
-  display: none;
-  width: 100%;
-  border: 1px solid #f1f1f1;
-  box-shadow: 0 0 1px #f1f1f1;
-  font-size: 15px;
-  color: #605b5b;
-  padding: 3px 10px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
 }

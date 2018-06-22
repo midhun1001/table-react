@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import copy from 'clipboard-copy';
+import Nav from './Nav';
 import './index.scss';
 
 class Table extends Component {
@@ -14,9 +15,8 @@ class Table extends Component {
       pageCountProp: this.props.pageCount ? this.props.pageCount : 10,
       startcount: 0,
       count: this.props.pageCount ? this.props.pageCount : 10,
-      // uploadTable: '',
-      // uploadHeader: '',
-      msg: 'Loading Table...'
+      msg: 'Loading Table...',
+      csvError: ''
     };
     this.fnExcelReport = () => {
       let csvContent = 'data:text/csv;charset=utf-8,';
@@ -171,7 +171,7 @@ class Table extends Component {
         if (e.target.value === '') {
           this.setState({ pageno: e.target.value });
         } else if ((e.target.value > 0)
-        && e.target.value <= (this.state.list.length / this.state.pageCountProp)) {
+        && e.target.value <= Math.round((this.state.list.length / this.state.pageCountProp))) {
           this.setState({
             pageno: e.target.value,
             count: e.target.value * this.state.pageCountProp,
@@ -181,33 +181,48 @@ class Table extends Component {
       }
     };
     this.checkData = () => {
+      if (this.props.upload && this.state.list.length === 0) {
+        this.setState({ csvError: 'Upload CSV File' });
+      }
       setTimeout(() => {
         this.setState({ msg: 'No Data' });
       }, 2000);
     };
     this.upload = (event) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const text = reader.result;
-        let rows = '';
-        const dataArr = text.split('\n');
-        const headerArr = dataArr[0].split(',');
-        let header = '<tr>';
-        for (let k = 0; k < headerArr.length - 1; k += 1) {
-          header += `<th>${headerArr[k]}</th>`;
-        }
-        header += '</tr>';
-        for (let i = 1; i < dataArr.length - 1; i += 1) {
-          rows += '<tr>';
-          const cols = dataArr[i].split(',');
-          for (let j = 0; j < cols.length - 1; j += 1) {
-            rows += `<td>${cols[j]}</td>`;
+      if (event.target.files[0] && event.target.files[0].type === 'text/csv') {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const text = reader.result;
+          const rows = [];
+          const dataArr = text.split('\n');
+          const headerArr = dataArr[0].split(',');
+          const headerObj = [];
+          if (dataArr.length <= 5002) {
+            for (let k = 0; k < headerArr.length - 1; k += 1) {
+              headerObj.push({ headerName: headerArr[k], mapKey: headerArr[k] });
+            }
+            this.setState({ headers: headerObj }, () => {
+              const cols = [];
+              for (let i = 1; i < dataArr.length; i += 1) {
+                cols.push(dataArr[i].split(','));
+              }
+              for (let j = 0; j < cols.length; j += 1) {
+                const obj = {};
+                for (let l = 0; l < this.state.headers.length; l += 1) {
+                  obj[this.state.headers[l].mapKey] = cols[j][l];
+                }
+                rows.push(obj);
+              }
+              this.setState({ list: rows, csvError: '' });
+            });
+          } else {
+            this.setState({ csvError: 'Maximum count of 5000 rows only allowed' });
           }
-          rows += '</tr>';
-        }
-        this.setState({ uploadHeader: header, uploadTable: rows });
-      };
-      reader.readAsText(event.target.files[0]);
+        };
+        reader.readAsText(event.target.files[0]);
+      } else {
+        this.setState({ csvError: 'Supports only csv' });
+      }
     };
   }
   componentDidMount() {
@@ -215,130 +230,104 @@ class Table extends Component {
   }
   componentWillReceiveProps(nextProps) {
     this.setState({
-      list: nextProps.list ? nextProps.list : [],
-      headers: nextProps.headers ? nextProps.headers : [],
-      start: false,
-      pageno: 1,
-      pageCountProp: nextProps.pageCount ? nextProps.pageCount : 10,
-      startcount: 0,
-      count: nextProps.pageCount ? nextProps.pageCount : 10
+      list: nextProps.list ? nextProps.list : []
     });
   }
   render() {
     return (
       <div className="spreadsheet">
+        {
+          this.state.list.length === 0 &&
+          <p className="nodata">
+            {this.state.msg}
+          </p>
+        }
         <div>
+          <div className="spreadsheet__copy">
+            {
+              this.props.upload &&
+              <div style={{ display: 'inline-block' }}>
+                <label
+                  htmlFor="file-upload"
+                  className="select-all sheet-btn"
+                  style={this.btnStyles()}
+                >
+                    Upload CSV
+                </label>
+                <input
+                  onChange={this.upload}
+                  id="file-upload"
+                  type="file"
+                />
+              </div>
+            }
+            {
+              (this.state.list.length > 0 && this.props.csv) &&
+              <div style={{ display: 'inline-block' }}>
+                <button
+                  className="csv__export-btn sheet-btn"
+                  onClick={this.fnExcelReport}
+                  style={this.btnStyles()}
+                >
+                  Download Full Table as CSV
+                </button>
+                <button
+                  onClick={() => this.toggleAllSelect('select')}
+                  className="select-all sheet-btn"
+                  style={this.btnStyles()}
+                >
+                  Copy all rows of page
+                </button>
+                <button
+                  onClick={() => this.toggleAllSelect('clear')}
+                  className="de-select sheet-btn"
+                  style={this.btnStyles()}
+                >
+                  De-select All
+                </button>
+              </div>
+            }
+            {
+              this.props.upload &&
+              <p className="nodata">
+                { this.state.csvError }
+              </p>
+            }
+          </div>
           {
-            this.props.upload &&
-            <input type="file" onChange={this.upload} />
-          }
-          {
-            this.props.csv &&
-            <div className="spreadsheet__copy">
-              <button
-                className="csv__export-btn sheet-btn"
-                onClick={this.fnExcelReport}
-                style={this.btnStyles()}
-              >
-                Download Full Table as CSV
-              </button>
-              <button
-                onClick={() => this.toggleAllSelect('select')}
-                className="select-all sheet-btn"
-                style={this.btnStyles()}
-              >
-                Copy all rows of page
-              </button>
-              <button
-                onClick={() => this.toggleAllSelect('clear')}
-                className="de-select sheet-btn"
-                style={this.btnStyles()}
-              >
-                De-select All
-              </button>
+            this.state.list.length > 0 &&
+            <div>
+              <div className="spreadsheet__table">
+                <Nav
+                  changePage={this.changePage}
+                  styles={this.btnStyles()}
+                  pageno={this.state.pageno}
+                />
+                <div className="table__wrapper">
+                  <table id="exl__table" className="exl__table">
+                    <thead className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}>
+                      <tr>
+                        {
+                          (this.state.headers.length > 0) &&
+                          this.state.headers.map((val, index) => (
+                            <th key={index}>{val.headerName}</th>
+                          ))
+                        }
+                      </tr>
+                    </thead>
+                    <tbody className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}>
+                      { this.renderList() }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <Nav
+                changePage={this.changePage}
+                styles={this.btnStyles()}
+                pageno={this.state.pageno}
+              />
             </div>
           }
-          <div className="spreadsheet__table">
-            <div className="spreadsheet__table-dir">
-              <button
-                className="spreadsheet__table-prev sheet-btn"
-                onClick={(e) => this.changePage(e, 'prev')}
-                style={this.btnStyles()}
-              >
-                Prev
-              </button>
-              <span className="spreadsheet__table-pageno">
-                <input type="number" onChange={(e) => this.changePage(e, null)} value={this.state.pageno} />
-              </span>
-              <button
-                className="spreadsheet__table-next sheet-btn"
-                onClick={(e) => this.changePage(e, 'next')}
-                style={this.btnStyles()}
-              >
-                Next
-              </button>
-            </div>
-            <table id="exl__table" className="exl__table">
-              {
-                this.props.upload && (this.state.list.length === 0) &&
-                <thead
-                  dangerouslySetInnerHTML={{ __html: this.state.uploadHeader }}
-                  className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}
-                />
-              }
-              {
-                this.props.upload && (this.state.list.length === 0) &&
-                <tbody
-                  dangerouslySetInnerHTML={{ __html: this.state.uploadTable }}
-                  className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}
-                />
-              }
-              {
-                !this.props.upload && (this.state.list.length > 0) &&
-                <thead className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}>
-                  <tr>
-                    {
-                      (this.state.headers.length > 0) &&
-                      this.state.headers.map((val, index) => (
-                        <th key={index}>{val.headerName}</th>
-                      ))
-                    }
-                  </tr>
-                </thead>
-              }
-              {
-                !this.props.upload && (this.state.list.length > 0) &&
-                <tbody className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}>
-                  { this.renderList() }
-                  {
-                    this.state.list.length === 0 &&
-                    <tr className="nodata">
-                      <td>{this.state.msg}</td>
-                    </tr>
-                  }
-                </tbody>
-              }
-            </table>
-          </div>
-          <div className="spreadsheet__table-dir">
-            <button
-              className="spreadsheet__table-prev sheet-btn"
-              onClick={(e) => this.changePage(e, 'prev')}
-              style={this.btnStyles()}
-            >
-              Prev
-            </button>
-            <span className="spreadsheet__table-pageno">
-              <input type="number" onChange={(e) => this.changePage(e, null)} value={this.state.pageno} />
-            </span>
-            <button
-              className="spreadsheet__table-next sheet-btn"
-              onClick={(e) => this.changePage(e, 'next')}
-              style={this.btnStyles()}
-            >
-              Next
-            </button>
-          </div>
         </div>
       </div>
     );
