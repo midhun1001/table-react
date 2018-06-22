@@ -135,6 +135,7 @@ import Table "react-table-spreadsheet";
           <p><strong>Optional. Type: Function</strong></p>
           <p>
             Callback function to get the editable row data in json format.
+            Double click the column to edit it's content
             <strong>Note: edited prop should pass in order to activate inline editing</strong>
           </p>
       </td>

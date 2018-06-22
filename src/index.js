@@ -14,6 +14,8 @@ class Table extends Component {
       pageCountProp: this.props.pageCount ? this.props.pageCount : 10,
       startcount: 0,
       count: this.props.pageCount ? this.props.pageCount : 10,
+      // uploadTable: '',
+      // uploadHeader: '',
       msg: 'Loading Table...'
     };
     this.fnExcelReport = () => {
@@ -183,6 +185,30 @@ class Table extends Component {
         this.setState({ msg: 'No Data' });
       }, 2000);
     };
+    this.upload = (event) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = reader.result;
+        let rows = '';
+        const dataArr = text.split('\n');
+        const headerArr = dataArr[0].split(',');
+        let header = '<tr>';
+        for (let k = 0; k < headerArr.length - 1; k += 1) {
+          header += `<th>${headerArr[k]}</th>`;
+        }
+        header += '</tr>';
+        for (let i = 1; i < dataArr.length - 1; i += 1) {
+          rows += '<tr>';
+          const cols = dataArr[i].split(',');
+          for (let j = 0; j < cols.length - 1; j += 1) {
+            rows += `<td>${cols[j]}</td>`;
+          }
+          rows += '</tr>';
+        }
+        this.setState({ uploadHeader: header, uploadTable: rows });
+      };
+      reader.readAsText(event.target.files[0]);
+    };
   }
   componentDidMount() {
     this.checkData();
@@ -201,71 +227,38 @@ class Table extends Component {
   render() {
     return (
       <div className="spreadsheet">
-        {
-          this.state.list.length > 0 &&
-          <div>
-            {
-              this.props.csv &&
-              <div className="spreadsheet__copy">
-                <button
-                  className="csv__export-btn sheet-btn"
-                  onClick={this.fnExcelReport}
-                  style={this.btnStyles()}
-                >
-                  Download Full Table as CSV
-                </button>
-                <button
-                  onClick={() => this.toggleAllSelect('select')}
-                  className="select-all sheet-btn"
-                  style={this.btnStyles()}
-                >
-                  Copy all rows of page
-                </button>
-                <button
-                  onClick={() => this.toggleAllSelect('clear')}
-                  className="de-select sheet-btn"
-                  style={this.btnStyles()}
-                >
-                  De-select All
-                </button>
-              </div>
-            }
-            <div className="spreadsheet__table">
-              <div className="spreadsheet__table-dir">
-                <button
-                  className="spreadsheet__table-prev sheet-btn"
-                  onClick={(e) => this.changePage(e, 'prev')}
-                  style={this.btnStyles()}
-                >
-                  Prev
-                </button>
-                <span className="spreadsheet__table-pageno">
-                  <input type="number" onChange={(e) => this.changePage(e, null)} value={this.state.pageno} />
-                </span>
-                <button
-                  className="spreadsheet__table-next sheet-btn"
-                  onClick={(e) => this.changePage(e, 'next')}
-                  style={this.btnStyles()}
-                >
-                  Next
-                </button>
-              </div>
-              <table id="exl__table" className="exl__table">
-                <thead className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}>
-                  <tr>
-                    {
-                      (this.state.headers.length > 0) &&
-                      this.state.headers.map((val, index) => (
-                        <th key={index}>{val.headerName}</th>
-                      ))
-                    }
-                  </tr>
-                </thead>
-                <tbody className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}>
-                  { this.renderList() }
-                </tbody>
-              </table>
+        <div>
+          {
+            this.props.upload &&
+            <input type="file" onChange={this.upload} />
+          }
+          {
+            this.props.csv &&
+            <div className="spreadsheet__copy">
+              <button
+                className="csv__export-btn sheet-btn"
+                onClick={this.fnExcelReport}
+                style={this.btnStyles()}
+              >
+                Download Full Table as CSV
+              </button>
+              <button
+                onClick={() => this.toggleAllSelect('select')}
+                className="select-all sheet-btn"
+                style={this.btnStyles()}
+              >
+                Copy all rows of page
+              </button>
+              <button
+                onClick={() => this.toggleAllSelect('clear')}
+                className="de-select sheet-btn"
+                style={this.btnStyles()}
+              >
+                De-select All
+              </button>
             </div>
+          }
+          <div className="spreadsheet__table">
             <div className="spreadsheet__table-dir">
               <button
                 className="spreadsheet__table-prev sheet-btn"
@@ -285,14 +278,68 @@ class Table extends Component {
                 Next
               </button>
             </div>
+            <table id="exl__table" className="exl__table">
+              {
+                this.props.upload && (this.state.list.length === 0) &&
+                <thead
+                  dangerouslySetInnerHTML={{ __html: this.state.uploadHeader }}
+                  className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}
+                />
+              }
+              {
+                this.props.upload && (this.state.list.length === 0) &&
+                <tbody
+                  dangerouslySetInnerHTML={{ __html: this.state.uploadTable }}
+                  className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}
+                />
+              }
+              {
+                !this.props.upload && (this.state.list.length > 0) &&
+                <thead className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}>
+                  <tr>
+                    {
+                      (this.state.headers.length > 0) &&
+                      this.state.headers.map((val, index) => (
+                        <th key={index}>{val.headerName}</th>
+                      ))
+                    }
+                  </tr>
+                </thead>
+              }
+              {
+                !this.props.upload && (this.state.list.length > 0) &&
+                <tbody className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}>
+                  { this.renderList() }
+                  {
+                    this.state.list.length === 0 &&
+                    <tr className="nodata">
+                      <td>{this.state.msg}</td>
+                    </tr>
+                  }
+                </tbody>
+              }
+            </table>
           </div>
-        }
-        {
-          this.state.list.length === 0 &&
-          <p className="nodata">
-            {this.state.msg}
-          </p>
-        }
+          <div className="spreadsheet__table-dir">
+            <button
+              className="spreadsheet__table-prev sheet-btn"
+              onClick={(e) => this.changePage(e, 'prev')}
+              style={this.btnStyles()}
+            >
+              Prev
+            </button>
+            <span className="spreadsheet__table-pageno">
+              <input type="number" onChange={(e) => this.changePage(e, null)} value={this.state.pageno} />
+            </span>
+            <button
+              className="spreadsheet__table-next sheet-btn"
+              onClick={(e) => this.changePage(e, 'next')}
+              style={this.btnStyles()}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -306,6 +353,7 @@ Table.propTypes = {
   tbodyStyle: PropTypes.string,
   btnBg: PropTypes.string,
   csv: PropTypes.bool,
+  upload: PropTypes.bool,
   edited: PropTypes.func
 };
 
