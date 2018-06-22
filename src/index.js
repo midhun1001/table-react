@@ -183,10 +183,11 @@ class Table extends Component {
     this.checkData = () => {
       if (this.props.upload && this.state.list.length === 0) {
         this.setState({ csvError: 'Upload CSV File' });
+      } else {
+        setTimeout(() => {
+          this.setState({ msg: 'No Data' });
+        }, 2000);
       }
-      setTimeout(() => {
-        this.setState({ msg: 'No Data' });
-      }, 2000);
     };
     this.upload = (event) => {
       if (event.target.files[0] && event.target.files[0].type === 'text/csv') {
@@ -237,7 +238,7 @@ class Table extends Component {
     return (
       <div className="spreadsheet">
         {
-          this.state.list.length === 0 &&
+          !this.props.upload && this.state.list.length === 0 &&
           <p className="nodata">
             {this.state.msg}
           </p>
