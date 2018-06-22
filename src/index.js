@@ -94,11 +94,11 @@ class Table extends Component {
       copy(copyText);
     };
     this.contentEdit = (e, param, value) => {
-      if (this.props.editable) {
+      if (this.props.edited) {
         e.persist();
         if (param === 'hide') {
           e.target.contentEditable = false;
-          if (e.target.innerText.trim() !== value && this.props.edited) {
+          if (e.target.innerText.trim() !== value) {
             const crntRow = e.target.parentNode;
             const editJson = {};
             for (let i = 0; i < crntRow.childNodes.length; i += 1) {
@@ -306,7 +306,6 @@ Table.propTypes = {
   tbodyStyle: PropTypes.string,
   btnBg: PropTypes.string,
   csv: PropTypes.bool,
-  editable: PropTypes.bool,
   edited: PropTypes.func
 };
 

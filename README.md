@@ -130,21 +130,12 @@ import Table "react-table-spreadsheet";
       </td>
     </tr>
     <tr>
-      <td>editable</td>
-      <td>
-          <p><strong>Optional. Type: Boolean</strong></p>
-          <p>
-            To enable the content editable functionality
-          </p>
-      </td>
-    </tr>
-    <tr>
       <td>edited</td>
       <td>
           <p><strong>Optional. Type: Function</strong></p>
           <p>
             Callback function to get the editable row data in json format.
-            <strong>Note: editable prop should be true</strong>
+            <strong>Note: edited prop should pass in order to activate inline editing</strong>
           </p>
       </td>
     </tr>
