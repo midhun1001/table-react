@@ -6,7 +6,6 @@
   "author": "midhun1001 <midhun.murali.mm@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production"
   },
   "peerDependencies": {
