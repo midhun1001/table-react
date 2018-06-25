@@ -106,7 +106,11 @@ class Table extends Component {
             for (let i = 0; i < crntRow.childNodes.length; i += 1) {
               editJson[crntRow.childNodes[i].getAttribute('mapkey')] = crntRow.childNodes[i].innerText;
             }
-            this.props.edited(editJson);
+            const { list } = this.state;
+            list[e.target.parentNode.getAttribute('rowno')] = editJson;
+            this.setState({ list }, () => {
+              this.props.edited(editJson);
+            });
           }
         } else {
           e.target.contentEditable = true;
@@ -127,6 +131,7 @@ class Table extends Component {
               onMouseDown={this.startMultiselect}
               onMouseOver={this.selectMulti}
               onMouseUp={this.deselect}
+              rowno={index}
             >
               {
                 this.state.headers.map((headers, i) => (
