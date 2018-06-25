@@ -147,6 +147,7 @@ import Table "react-table-spreadsheet";
           <p>
             To enable csv file upload.
           </p>
+          <p><strong>Note: First line will be considered as Header.</strong></p>
       </td>
     </tr>
   </tbody>
