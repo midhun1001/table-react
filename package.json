@@ -41,5 +41,15 @@
     "react-dom": "^16.4.0",
     "react-file-reader": "^1.1.4",
     "sass-loader": "^7.0.3"
-  }
+  },
+  "keywords": [
+    "table",
+    "react table",
+    "spreadsheet",
+    "edit table",
+    "react",
+    "react-component",
+    "excel",
+    "ui"
+  ]
 }
