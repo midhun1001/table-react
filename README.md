@@ -143,7 +143,7 @@ import Table "react-table-spreadsheet";
     <tr>
       <td>upload</td>
       <td>
-          <p><strong>Optional. Type: Boolean</strong></p>
+          <p><strong>Optional. Type: Boolean </strong></p>
           <p>
             To enable csv file upload.
           </p>
