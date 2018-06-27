@@ -47,6 +47,7 @@
     "react",
     "react-component",
     "excel",
-    "ui"
+    "ui",
+    "front-end"
   ]
 }
