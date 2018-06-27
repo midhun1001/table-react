@@ -1,9 +1,9 @@
 <h1>React Table</h1>
 
 <h4>
-  <p>Light weight simple react table from where you can copy the rows from table and paste directly into Excel sheet as csv data.</p>
-  <p>Upload excel sheet to display as table. Also you can download the table as excel. Along with that, you can do inline editing.</p>
+Light weight simple react table from where you can copy the rows from table and paste directly into Excel sheet as csv data. Upload excel sheet to display as table. Also you can download the table as excel. Along with that, you can do inline editing.
 </h4>
+<h3>Demo: https://codesandbox.io/s/k5kq105337</h3>
 
 <p>npm install react-table-spreadsheet</p>
 <p>yarn add react-table-spreadsheet</p>
