@@ -1,6 +1,6 @@
 {
   "name": "react-table-csv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "build/index.js",
   "repository": "https://github.com/midhun1001/table-react.git",
   "author": "midhun1001 <midhun.murali.mm@gmail.com>",
