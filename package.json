@@ -1,5 +1,5 @@
 {
-  "name": "react-table-spreadsheet",
+  "name": "react-table-csv",
   "version": "1.0.0",
   "main": "build/index.js",
   "repository": "https://github.com/midhun1001/react-webpack.git",
