@@ -2,7 +2,7 @@
   "name": "react-table-csv",
   "version": "1.0.0",
   "main": "build/index.js",
-  "repository": "https://github.com/midhun1001/react-webpack.git",
+  "repository": "https://github.com/midhun1001/table-react.git",
   "author": "midhun1001 <midhun.murali.mm@gmail.com>",
   "license": "MIT",
   "scripts": {
