@@ -9,6 +9,7 @@ class Table extends Component {
     super(props);
     this.state = {
       list: this.props.list ? this.props.list : [],
+      listData: this.props.list ? this.props.list : [],
       headers: this.props.headers ? this.props.headers : [],
       start: false,
       pageno: 1,
@@ -16,7 +17,8 @@ class Table extends Component {
       startcount: 0,
       count: this.props.pageCount ? this.props.pageCount : 10,
       msg: 'Loading Table...',
-      csvError: ''
+      csvError: '',
+      search: ''
     };
     this.fnExcelReport = () => {
       let csvContent = 'data:text/csv;charset=utf-8,';
@@ -230,13 +232,36 @@ class Table extends Component {
         this.setState({ csvError: 'Supports only csv' });
       }
     };
+    this.search = (e) => {
+      this.setState({ search: e.target.value.toString() }, () => {
+        this.find();
+      });
+    };
+    this.find = () => {
+      if (this.state.search.trim().length !== 0) {
+        const tempArr = [];
+        const { listData } = this.state;
+        for (let i = 0; i < listData.length; i += 1) {
+          for (let j = 0; j < Object.keys(listData[i]).length; j += 1) {
+            if (listData[i][Object.keys(listData[i])[j]].toString().includes(this.state.search)) {
+              tempArr.push(listData[i]);
+              break;
+            }
+          }
+        }
+        this.setState({ list: tempArr });
+      } else {
+        this.setState({ list: this.state.listData });
+      }
+    };
   }
   componentDidMount() {
     this.checkData();
   }
   componentWillReceiveProps(nextProps) {
     this.setState({
-      list: nextProps.list ? nextProps.list : []
+      list: nextProps.list ? nextProps.list : [],
+      listData: nextProps.list ? nextProps.list : []
     });
   }
   render() {
@@ -250,6 +275,7 @@ class Table extends Component {
         }
         <div>
           <div className="spreadsheet__copy">
+            <input className="spreadsheet__search" type="text" onChange={this.search} value={this.state.search} placeholder="Search" />
             {
               this.props.upload &&
               <div style={{ display: 'inline-block' }}>
