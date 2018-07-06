@@ -243,7 +243,7 @@ class Table extends Component {
         const { listData } = this.state;
         for (let i = 0; i < listData.length; i += 1) {
           for (let j = 0; j < Object.keys(listData[i]).length; j += 1) {
-            if (listData[i][Object.keys(listData[i])[j]].toString().includes(this.state.search)) {
+            if (listData[i][Object.keys(listData[i])[j]].toString().toLowerCase().includes(this.state.search)) {
               tempArr.push(listData[i]);
               break;
             }
