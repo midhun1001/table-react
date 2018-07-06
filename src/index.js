@@ -267,12 +267,6 @@ class Table extends Component {
   render() {
     return (
       <div className="spreadsheet">
-        {
-          !this.props.upload && this.state.list.length === 0 &&
-          <p className="nodata">
-            {this.state.msg}
-          </p>
-        }
         <div>
           <div className="spreadsheet__copy">
             <input className="spreadsheet__search" type="text" onChange={this.search} value={this.state.search} placeholder="Search" />
@@ -361,6 +355,12 @@ class Table extends Component {
             </div>
           }
         </div>
+        {
+          !this.props.upload && this.state.list.length === 0 &&
+          <p className="nodata">
+            {this.state.msg}
+          </p>
+        }
       </div>
     );
   }
