@@ -1,4 +1,4 @@
-<h1>React Table</h1>
+<h2>React Table</h2>
 
 <h4>
 Light weight simple react table from where you can copy the rows from table and paste directly into Excel sheet as csv data. Upload excel sheet to display as table. Also you can download the table as excel. Along with that, you can do inline editing.
