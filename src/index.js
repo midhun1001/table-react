@@ -129,6 +129,7 @@ class Table extends Component {
         if ((index >= this.state.startcount) && (index < this.state.count)) {
           return (
             <tr
+              uniquekey={this.props.uniquekey ? this.props.uniquekey: ''}
               key={index}
               onMouseDown={this.startMultiselect}
               onMouseOver={this.selectMulti}
