@@ -124,6 +124,12 @@ class Table extends Component {
         }
       }
     };
+    this.doubleclick = (e) => {
+      e.persist();
+      if (this.props.doubleclick) {
+        this.props.doubleclick(e);
+      }
+    };
     this.renderList = () => (
       this.state.list.map((val, index) => {
         if ((index >= this.state.startcount) && (index < this.state.count)) {
@@ -133,7 +139,7 @@ class Table extends Component {
               onMouseDown={this.startMultiselect}
               onMouseOver={this.selectMulti}
               onMouseUp={this.deselect}
-              rowno={this.props.uniquekey ? this.props.uniquekey: index}
+              rowno={this.props.uniquekey ? val[this.props.uniquekey] : index}
             >
               {
                 this.state.headers.map((headers, i) => (
@@ -143,6 +149,7 @@ class Table extends Component {
                     onClick={this.contentEdit}
                     onBlur={(e) => this.contentEdit(e, 'hide', val[headers.mapKey])}
                     mapkey={headers.mapKey}
+                    onDoubleClick={this.doubleclick}
                   >
                     {val[headers.mapKey]}
                   </td>
@@ -375,7 +382,9 @@ Table.propTypes = {
   btnBg: PropTypes.string,
   csv: PropTypes.bool,
   upload: PropTypes.bool,
-  edited: PropTypes.func
+  edited: PropTypes.func,
+  uniquekey: PropTypes.string,
+  doubleclick: PropTypes.func,
 };
 
 export default Table;
