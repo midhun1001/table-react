@@ -244,22 +244,63 @@ class Table extends Component {
         this.find();
       });
     };
-    this.find = () => {
-      if (this.state.search.trim().length !== 0) {
-        const tempArr = [];
-        const { listData } = this.state;
-        for (let i = 0; i < listData.length; i += 1) {
-          for (let j = 0; j < Object.keys(listData[i]).length; j += 1) {
-            if (listData[i][Object.keys(listData[i])[j]].toString().toLowerCase().includes(this.state.search.toLowerCase())) {
-              tempArr.push(listData[i]);
-              break;
+    this.find = (value, key) => {
+      if (value || key) {
+        const sortInput = document.querySelectorAll('#exl__table thead tr th input');
+        const flags = [];
+        for (let i = 0; i < sortInput.length; i += 1) {
+          if (sortInput[i].value) {
+            flags.push({ val: sortInput[i].value, key: sortInput[i].getAttribute('mapKey') });
+          }
+        }
+        if (flags.length === 0) {
+          this.setState({ list: this.state.listData });
+        } else {
+          const tempArrsort = [];
+          const list = flags.length === 1 ? this.state.listData : this.state.list;
+          const inputVal = flags.length === 1 ? flags[0].val : value;
+          const keyVal = flags.length === 1 ? flags[0].key : key;
+          for (let i = 0; i < list.length; i += 1) {
+            if (list[i][keyVal].toLowerCase().includes(inputVal.toString().toLowerCase())) {
+              tempArrsort.push(list[i]);
+            }
+          }
+          if (tempArrsort.length > 0) {
+            this.setState({ list: tempArrsort, [key]: '' });
+          } else {
+            this.setState({ list });
+            if (value.trim().length > 0) {
+              this.setState({ [key]: 'Not matching' });
+            } else {
+              this.setState({ [key]: '' });
             }
           }
         }
-        this.setState({ list: tempArr });
       } else {
-        this.setState({ list: this.state.listData });
+        if (this.state.search.trim().length !== 0) {
+          const sortInput = document.querySelectorAll('#exl__table thead tr th input');
+          for (let k = 0; k < sortInput.length; k += 1) {
+            sortInput[k].value = '';
+          }
+          const tempArr = [];
+          const { listData } = this.state;
+          for (let i = 0; i < listData.length; i += 1) {
+            for (let j = 0; j < Object.keys(listData[i]).length; j += 1) {
+              if (listData[i][Object.keys(listData[i])[j]].toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+                tempArr.push(listData[i]);
+                break;
+              }
+            }
+          }
+          this.setState({ list: tempArr });
+        } else {
+          this.setState({ list: this.state.listData });
+        }
       }
+    };
+    this.setSort = (e, key) => {
+      const value = e.target.value;
+      this.find(value, key);
     };
   }
   componentDidMount() {
@@ -343,7 +384,16 @@ class Table extends Component {
                         {
                           (this.state.headers.length > 0) &&
                           this.state.headers.map((val, index) => (
-                            <th key={index}>{val.headerName}</th>
+                            <th key={index}>
+                              {val.headerName}
+                              {
+                                val.sort &&
+                                <div className="exl__table__sort">
+                                  <input className="exl__table__sort-input" type="text" onChange={(e) => this.setSort(e, val.mapKey)} mapKey={val.mapKey} />
+                                  <span className="exl__table__sort-error">{this.state[val.mapKey]}</span>
+                                </div>
+                              }
+                            </th>
                           ))
                         }
                       </tr>
