@@ -261,7 +261,7 @@ class Table extends Component {
           const inputVal = flags.length === 1 ? flags[0].val : value;
           const keyVal = flags.length === 1 ? flags[0].key : key;
           for (let i = 0; i < list.length; i += 1) {
-            if (list[i][keyVal].toLowerCase().includes(inputVal.toString().toLowerCase())) {
+            if (list[i][keyVal].toString().toLowerCase().includes(inputVal.toString().toLowerCase())) {
               tempArrsort.push(list[i]);
             }
           }
