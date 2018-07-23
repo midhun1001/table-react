@@ -250,7 +250,7 @@ class Table extends Component {
         const flags = [];
         for (let i = 0; i < sortInput.length; i += 1) {
           if (sortInput[i].value) {
-            flags.push({ val: sortInput[i].value, key: sortInput[i].getAttribute('mapKey') });
+            flags.push({ val: sortInput[i].value, key: sortInput[i].getAttribute('mapkey') });
           }
         }
         if (flags.length === 0) {
@@ -389,7 +389,7 @@ class Table extends Component {
                               {
                                 val.sort &&
                                 <div className="exl__table__sort">
-                                  <input className="exl__table__sort-input" type="text" onChange={(e) => this.setSort(e, val.mapKey)} mapKey={val.mapKey} />
+                                  <input className="exl__table__sort-input" type="text" onChange={(e) => this.setSort(e, val.mapKey)} mapkey={val.mapKey} />
                                   <span className="exl__table__sort-error">{this.state[val.mapKey]}</span>
                                 </div>
                               }
