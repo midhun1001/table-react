@@ -403,12 +403,12 @@ class Table extends Component {
                     </tbody>
                   </table>
                 </div>
+                <Nav
+                  changePage={this.changePage}
+                  styles={this.btnStyles()}
+                  pageno={this.state.pageno}
+                />
               </div>
-              <Nav
-                changePage={this.changePage}
-                styles={this.btnStyles()}
-                pageno={this.state.pageno}
-              />
             </div>
           }
         </div>
