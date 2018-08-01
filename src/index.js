@@ -239,23 +239,18 @@ class Table extends Component {
         this.setState({ csvError: 'Supports only csv' });
       }
     };
-    this.search = (e) => {
-      this.setState({ search: e.target.value.toString() }, () => {
-        this.find();
-      });
-    };
     this.find = (value, key) => {
-      if (value || key) {
-        const sortInput = document.querySelectorAll('#exl__table thead tr th input');
-        const flags = [];
-        for (let i = 0; i < sortInput.length; i += 1) {
-          if (sortInput[i].value) {
-            flags.push({ val: sortInput[i].value, key: sortInput[i].getAttribute('mapkey') });
-          }
+      const sortInput = document.querySelectorAll('#exl__table thead tr th input');
+      const flags = [];
+      for (let i = 0; i < sortInput.length; i += 1) {
+        if (sortInput[i].value) {
+          flags.push({ val: sortInput[i].value, key: sortInput[i].getAttribute('mapkey') });
         }
-        if (flags.length === 0) {
-          this.setState({ list: this.state.listData });
-        } else {
+      }
+      if (flags.length === 0) {
+        this.setState({ list: this.state.listData });
+      } else {
+        this.setState({ pageno: 1, startcount: 0, count: this.props.pageCount ? this.props.pageCount : 10 }, () => {
           const tempArrsort = [];
           const list = flags.length === 1 ? this.state.listData : this.state.list;
           const inputVal = flags.length === 1 ? flags[0].val : value;
@@ -275,27 +270,7 @@ class Table extends Component {
               this.setState({ [key]: '' });
             }
           }
-        }
-      } else {
-        if (this.state.search.trim().length !== 0) {
-          const sortInput = document.querySelectorAll('#exl__table thead tr th input');
-          for (let k = 0; k < sortInput.length; k += 1) {
-            sortInput[k].value = '';
-          }
-          const tempArr = [];
-          const { listData } = this.state;
-          for (let i = 0; i < listData.length; i += 1) {
-            for (let j = 0; j < Object.keys(listData[i]).length; j += 1) {
-              if (listData[i][Object.keys(listData[i])[j]].toString().toLowerCase().includes(this.state.search.toLowerCase())) {
-                tempArr.push(listData[i]);
-                break;
-              }
-            }
-          }
-          this.setState({ list: tempArr });
-        } else {
-          this.setState({ list: this.state.listData });
-        }
+        });
       }
     };
     this.setSort = (e, key) => {
@@ -317,7 +292,12 @@ class Table extends Component {
       <div className="spreadsheet">
         <div>
           <div className="spreadsheet__copy">
-            <input className="spreadsheet__search" type="text" onChange={this.search} value={this.state.search} placeholder="Search" />
+            {
+              this.state.list.length > 0 &&
+              <span className="spreadsheet__copy-len">
+                Total Pages: <strong>{parseInt(this.state.list.length / this.state.pageCountProp, 10) === 0 ? 1 : parseInt(this.state.list.length / this.state.pageCountProp, 10)}</strong>
+              </span>
+            }
             {
               this.props.upload &&
               <div style={{ display: 'inline-block' }}>

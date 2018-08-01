@@ -26,17 +26,12 @@
     min-height: .01%;
     overflow-x: auto;
   }
-  &__search {
-    margin: 0 0 15px 15px;
-    padding: 5px 15px;
-    font-size: 15px;
-    border: 1px solid #d5d5d5;
-    border-radius: 3px;
-    color: #252525;
-  }
   &__copy {
     text-align: right;
     width: 100%;
+    &-len {
+      float: left;
+    }
   }
   &__table {
     &-dir {
