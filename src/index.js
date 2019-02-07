@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import copy from 'clipboard-copy';
 import Nav from './Nav';
 import './index.scss';
 
-class Table extends Component {
+class Table extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,7 +18,8 @@ class Table extends Component {
       count: this.props.pageCount ? this.props.pageCount : 10,
       msg: 'Loading Table...',
       csvError: '',
-      search: ''
+      search: '',
+      filename: this.props.filename ? this.props.filename : 'data'
     };
     this.fnExcelReport = () => {
       let csvContent = 'data:text/csv;charset=utf-8,';
@@ -33,7 +34,12 @@ class Table extends Component {
         csvContent += '\r\n';
       }
       const encodedUri = encodeURI(csvContent);
-      window.open(encodedUri);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `${this.state.filename}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     };
     this.btnStyles = () => {
       const btnstyles = this.props.btnBg ? this.props.btnBg : '';
@@ -414,6 +420,7 @@ Table.propTypes = {
   upload: PropTypes.bool,
   edited: PropTypes.func,
   uniquekey: PropTypes.string,
+  filename: PropTypes.string,
   doubleclick: PropTypes.func,
 };
 

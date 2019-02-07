@@ -30,7 +30,8 @@
     text-align: right;
     width: 100%;
     &-len {
-      float: left;
+      display: block;
+      text-align: left;
     }
   }
   &__table {

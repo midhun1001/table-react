@@ -153,5 +153,15 @@ import Table from "csv-react-table";
           <p><strong>Note: First line will be considered as Header.</strong></p>
       </td>
     </tr>
+    <tr>
+      <td>filename</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            NAme given to file for download.
+          </p>
+          <p><strong>Note: Give name without extension</strong></p>
+      </td>
+    </tr>
   </tbody>
 </table>
