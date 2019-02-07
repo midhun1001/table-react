@@ -5,11 +5,11 @@ Light weight simple react table from where you can copy the rows from table and 
 </h4>
 <h3>Demo: https://codesandbox.io/s/k5kq105337</h3>
 
-<p>npm install react-table-spreadsheet</p>
-<p>yarn add react-table-spreadsheet</p>
+<p>npm install csv-react-table</p>
+<p>yarn add csv-react-table</p>
 
 ```html
-import Table "react-table-spreadsheet";
+import Table from "csv-react-table";
 
 <Table
   list={} //array object
