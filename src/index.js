@@ -1,427 +1,313 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import copy from 'clipboard-copy';
-import Nav from './Nav';
-import './index.scss';
+import _property from 'lodash.property';
+import _map from 'lodash.map';
+import { AsyncParser } from 'json2csv';
+import './styles.scss';
+
+let testFun = '';
+
+const PageNo = (props) => (
+  <li className="pageNoLi">
+    <button
+      className={`pageNoBtn ${props.pageNo === props.currentPageNo ? 'activePageNo' : ''}`}
+      onClick={() => props.callBack ? props.callBack(props.pageNo) : ''}
+    >
+      {props.pageNo}
+    </button>
+  </li>
+);
 
 class Table extends PureComponent {
   constructor(props) {
     super(props);
+
     this.state = {
-      list: this.props.list ? this.props.list : [],
-      listData: this.props.list ? this.props.list : [],
-      headers: this.props.headers ? this.props.headers : [],
-      start: false,
-      pageno: 1,
-      pageCountProp: this.props.pageCount ? this.props.pageCount : 10,
-      startcount: 0,
-      count: this.props.pageCount ? this.props.pageCount : 10,
-      msg: 'Loading Table...',
-      csvError: '',
-      search: '',
-      filename: this.props.filename ? this.props.filename : 'data'
+      perPage: this.props.pageCount || 10,
+      prevPageLimit: 0,
+      totalPages: 0,
+      currentPageLimit: 1,
+      currentPage: [],
+      currentPageNo: 1,
+      selectedRow: []
     };
-    this.fnExcelReport = () => {
-      let csvContent = 'data:text/csv;charset=utf-8,';
-      for (let i = 0; i < this.state.headers.length; i += 1) {
-        csvContent += `${this.state.headers[i].mapKey},`;
+
+    this.setPageNo = this.setPageNo.bind(this);
+  }
+
+  componentDidMount() {
+    this.setCurrentPage();
+    const totalPages = Math.ceil(this.props.list.length / this.state.perPage);
+    this.setState({ totalPages });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if ((prevState.prevPageLimit !== this.state.prevPageLimit)
+      || (prevState.perPage !== this.state.perPage)) {
+      this.setCurrentPage();
+    }
+  }
+
+  setCurrentPage() {
+    const list = [...this.props.list];
+    const currentPage = list.splice(this.state.prevPageLimit, this.state.perPage);
+
+    this.setState({ currentPage });
+  }
+
+  headers() {
+    return this.props.headers.map((header, i) => (
+      <th key={i} className="thStyle">{header.headerName}</th>
+    ));
+  };
+
+  selectRow(e, row) {
+    const selectedRow = [...this.state.selectedRow];
+
+    if (!selectedRow.includes(row)) {
+      e.currentTarget.style.background = '#e0f3fe';
+      selectedRow.push(row);
+    } else {
+      const index = selectedRow.indexOf(row);
+
+      selectedRow.splice(index, 1);
+      e.currentTarget.style.background = '';
+    }
+
+    this.setState({ selectedRow });
+  }
+
+  download(type) {
+    let downloadData = [];
+    const fields = this.props.headers.map((key) => (
+      {
+        label: key['headerName'],
+        value: key['mapKey'],
+        default: 'NULL'
       }
-      csvContent += '\r\n';
-      for (let j = 0; j < this.state.list.length; j += 1) {
-        for (let i = 0; i < this.state.headers.length; i += 1) {
-          csvContent += `${this.state.list[j][this.state.headers[i].mapKey]},`;
+    ));
+    const opts = {
+      fields,
+      excelStrings: true,
+    };
+
+    const transformOpts = { highWaterMark: 8192 };
+    const asyncParser = new AsyncParser(opts, transformOpts);
+    let csv = '';
+
+    switch (type) {
+      case 'partial':
+        downloadData = [...this.state.selectedRow];
+        break;
+
+      case 'full':
+        downloadData = [...this.props.list];
+        break;
+
+      default:
+        downloadData = [];
+        break;
+    };
+
+    asyncParser.processor
+      .on('data', chunk => (csv += chunk.toString()))
+      .on('end', () => this.downloadFile(csv))
+      .on('error', err => console.error(err));
+
+    asyncParser.input.push(JSON.stringify(downloadData));
+    asyncParser.input.push(null);
+  }
+
+  downloadFile(csv) {
+    const exportedFilenmae = 'export.csv';
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    if (navigator.msSaveBlob) { // IE 10+
+      navigator.msSaveBlob(blob, exportedFilenmae);
+    } else {
+      const link = document.createElement("a");
+
+      if (link.download !== undefined) { // feature detection
+        // Browsers that support HTML5 download attribute
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", exportedFilenmae);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  }
+
+  rows() {
+    return this.state.currentPage.map((row, i) => (
+      <tr key={i} onClick={(e) => this.selectRow(e, row)}>
+        {
+          this.props.headers.map((key, i) => {
+            const mapKey = key['mapKey'];
+
+            return (
+              <td
+                key={i}
+                className="tdStyle"
+              >
+                {row[mapKey]}
+              </td>
+            );
+          })
         }
-        csvContent += '\r\n';
-      }
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `${this.state.filename}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    };
-    this.btnStyles = () => {
-      const btnstyles = this.props.btnBg ? this.props.btnBg : '';
-      return {
-        backgroundColor: btnstyles,
-        borderColor: btnstyles
-      };
-    };
-    this.startMultiselect = (e) => {
-      if (this.props.csv) {
-        if (e.target.parentNode.style.background) {
-          e.target.parentNode.style.background = '';
-        } else {
-          e.target.parentNode.style.background = 'rgba(0, 170, 254, 0.29)';
-          this.setState({ start: true });
-        }
-      }
-    };
-    this.selectMulti = (e) => {
-      if (this.props.csv && this.state.start) {
-        e.target.parentNode.style.background = 'rgba(0, 170, 254, 0.29)';
-      }
-    };
-    this.selectRows = () => {
-      if (this.props.csv) {
-        let copyText = '';
-        const rows = document.querySelectorAll('.exl__table tbody tr');
-        for (let i = 0; i < rows.length; i += 1) {
-          if (rows[i].style.background) {
-            if (copyText !== '') {
-              copyText += '\r\n';
-            }
-            for (let j = 0; j < rows[i].childNodes.length; j += 1) {
-              copyText += `${rows[i].childNodes[j].innerText}, `;
-            }
-          }
-        }
-        copyText = copyText.replace(/,\s*$/, '');
-        return copyText;
-      }
-      return null;
-    };
-    this.deselect = () => {
-      if (this.props.csv) {
-        copy(this.selectRows());
-        this.setState({ start: false });
-      }
-    };
-    this.toggleAllSelect = (flag) => {
-      let copyText = '';
-      const rows = document.querySelectorAll('.exl__table tbody tr');
-      if (flag === 'clear') {
-        for (let i = 0; i < rows.length; i += 1) {
-          rows[i].style.background = '';
-        }
-      } else {
-        for (let i = 0; i < rows.length; i += 1) {
-          rows[i].style.background = 'rgba(0, 170, 254, 0.29)';
-        }
-        copyText = this.selectRows();
-      }
-      copy(copyText);
-    };
-    this.contentEdit = (e, param, value) => {
-      if (this.props.edited) {
-        e.persist();
-        if (param === 'hide') {
-          e.target.contentEditable = false;
-          if (e.target.innerText.trim() !== value) {
-            const crntRow = e.target.parentNode;
-            const editJson = {};
-            for (let i = 0; i < crntRow.childNodes.length; i += 1) {
-              editJson[crntRow.childNodes[i].getAttribute('mapkey')] = crntRow.childNodes[i].innerText;
-            }
-            const { list } = this.state;
-            list[e.target.parentNode.getAttribute('rowno')] = editJson;
-            this.setState({ list }, () => {
-              this.props.edited(editJson);
-            });
-          }
-        } else {
-          e.target.contentEditable = true;
-          setTimeout(() => {
-            if (document.activeElement !== e.target) {
-              e.target.contentEditable = false;
-            }
-          }, 300);
-        }
-      }
-    };
-    this.doubleclick = (e) => {
-      e.persist();
-      if (this.props.doubleclick) {
-        this.props.doubleclick(e);
-      }
-    };
-    this.renderList = () => (
-      this.state.list.map((val, index) => {
-        if ((index >= this.state.startcount) && (index < this.state.count)) {
-          return (
-            <tr
-              key={index}
-              onMouseDown={this.startMultiselect}
-              onMouseOver={this.selectMulti}
-              onMouseUp={this.deselect}
-              rowno={this.props.uniquekey ? val[this.props.uniquekey] : index}
-            >
-              {
-                this.state.headers.map((headers, i) => (
-                  <td
-                    tabIndex="0"
-                    key={i}
-                    onClick={this.contentEdit}
-                    onBlur={(e) => this.contentEdit(e, 'hide', val[headers.mapKey])}
-                    mapkey={headers.mapKey}
-                    onDoubleClick={this.doubleclick}
-                  >
-                    {val[headers.mapKey]}
-                  </td>
-                ))
-              }
-            </tr>
+      </tr>
+    ));
+  }
+
+  pagination() {
+    const pages = [];
+
+    if (this.state.totalPages > 0) {
+      if (this.state.totalPages <= 5) {
+        for (let i = 0; i < this.state.totalPages; i += 1) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={i} pageNo={i + 1} callBack={this.setPageNo} />
           );
         }
-        return null;
-      })
-    );
-    this.changePage = (e, param) => {
-      if (param === 'next' && this.state.pageno !== '') {
-        if ((this.state.list.length / this.state.pageCountProp) > this.state.pageno) {
-          this.setState({
-            pageno: parseInt(this.state.pageno, 10) + 1,
-            startcount: parseInt(this.state.count, 10),
-            count: parseInt(this.state.count, 10) + parseInt(this.state.pageCountProp, 10)
-          });
-        }
-      } else if (param === 'prev' && this.state.pageno !== '') {
-        if (this.state.pageno > 1) {
-          this.setState({
-            pageno: parseInt(this.state.pageno, 10) - 1,
-            count: parseInt(this.state.count, 10) - parseInt(this.state.pageCountProp, 10)
-          }, () => {
-            this.setState({
-              startcount: parseInt(this.state.count, 10) - parseInt(this.state.pageCountProp, 10)
-            });
-          });
-        }
       } else {
-        if (e.target.value === '') {
-          this.setState({ pageno: e.target.value });
-        } else if ((e.target.value > 0)
-        && e.target.value <= Math.round((this.state.list.length / this.state.pageCountProp))) {
-          this.setState({
-            pageno: e.target.value,
-            count: e.target.value * this.state.pageCountProp,
-            startcount: (e.target.value * this.state.pageCountProp) - this.state.pageCountProp
-          });
+        if (this.state.currentPageNo > 1) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={1} pageNo={1} callBack={this.setPageNo} />
+          );
         }
-      }
-    };
-    this.checkData = () => {
-      if (this.props.upload && this.state.list.length === 0) {
-        this.setState({ csvError: 'Upload CSV File' });
-      } else {
-        setTimeout(() => {
-          this.setState({ msg: 'No Data' });
-        }, 2000);
-      }
-    };
-    this.upload = (event) => {
-      if (event.target.files[0] && event.target.files[0].type === 'text/csv') {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const text = reader.result;
-          const rows = [];
-          const dataArr = text.split('\n');
-          const headerArr = dataArr[0].split(',');
-          const headerObj = [];
-          if (dataArr.length <= 5002) {
-            for (let k = 0; k < headerArr.length - 1; k += 1) {
-              headerObj.push({ headerName: headerArr[k], mapKey: headerArr[k] });
-            }
-            this.setState({ headers: headerObj }, () => {
-              const cols = [];
-              for (let i = 1; i < dataArr.length; i += 1) {
-                cols.push(dataArr[i].split(','));
-              }
-              for (let j = 0; j < cols.length; j += 1) {
-                const obj = {};
-                for (let l = 0; l < this.state.headers.length; l += 1) {
-                  obj[this.state.headers[l].mapKey] = cols[j][l];
-                }
-                rows.push(obj);
-              }
-              this.setState({ list: rows, csvError: '' });
-            });
-          } else {
-            this.setState({ csvError: 'Maximum count of 5000 rows only allowed' });
-          }
-        };
-        reader.readAsText(event.target.files[0]);
-      } else {
-        this.setState({ csvError: 'Supports only csv' });
-      }
-    };
-    this.find = (value, key) => {
-      const sortInput = document.querySelectorAll('#exl__table thead tr th input');
-      const flags = [];
-      for (let i = 0; i < sortInput.length; i += 1) {
-        if (sortInput[i].value) {
-          flags.push({ val: sortInput[i].value, key: sortInput[i].getAttribute('mapkey') });
+
+        if (this.state.currentPageNo >= this.state.totalPages - 1) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={2} pageNo={2} callBack={this.setPageNo} />
+          );
+        }
+
+        if (this.state.currentPageNo > 2) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={'1...'} pageNo={'...'} callBack={null} />
+          );
+        }
+
+        if (this.state.currentPageNo === this.state.totalPages) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={this.state.totalPages - 1} pageNo={this.state.totalPages - 1} callBack={this.setPageNo} />
+          );
+        }
+
+        pages.push(
+          <PageNo currentPageNo={this.state.currentPageNo} key={this.state.currentPageNo} pageNo={this.state.currentPageNo} callBack={this.setPageNo} />
+        );
+
+        if (this.state.currentPageNo === 1) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={2} pageNo={2} callBack={this.setPageNo} />
+          );
+        }
+
+        if (this.state.currentPageNo < (this.state.totalPages - 1)) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={'2...'} pageNo={'...'} callBack={null} />
+          );
+        }
+        if (this.state.currentPageNo < 3) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={this.state.totalPages - 1} pageNo={this.state.totalPages - 1} callBack={this.setPageNo} />
+          );
+        }
+
+        if (this.state.currentPageNo < this.state.totalPages) {
+          pages.push(
+            <PageNo currentPageNo={this.state.currentPageNo} key={this.state.totalPages} pageNo={this.state.totalPages} callBack={this.setPageNo} />
+          );
         }
       }
-      if (flags.length === 0) {
-        this.setState({ list: this.state.listData });
-      } else {
-        this.setState({ pageno: 1, startcount: 0, count: this.props.pageCount ? this.props.pageCount : 10 }, () => {
-          const tempArrsort = [];
-          const list = flags.length === 1 ? this.state.listData : this.state.list;
-          const inputVal = flags.length === 1 ? flags[0].val : value;
-          const keyVal = flags.length === 1 ? flags[0].key : key;
-          for (let i = 0; i < list.length; i += 1) {
-            if (list[i][keyVal].toString().toLowerCase().includes(inputVal.toString().toLowerCase())) {
-              tempArrsort.push(list[i]);
-            }
-          }
-          if (tempArrsort.length > 0) {
-            this.setState({ list: tempArrsort, [key]: '' });
-          } else {
-            this.setState({ list });
-            if (value.trim().length > 0) {
-              this.setState({ [key]: 'Not matching' });
-            } else {
-              this.setState({ [key]: '' });
-            }
-          }
-        });
-      }
-    };
-    this.setSort = (e, key) => {
-      const value = e.target.value;
-      this.find(value, key);
-    };
+    }
+
+    return pages;
   }
-  componentDidMount() {
-    this.checkData();
+
+  navigate(direction) {
+    switch (direction) {
+      case 'left': {
+        if (this.state.currentPageNo > 1) {
+          const newPageNo = this.state.currentPageNo - 1;
+          this.setPageNo(newPageNo);
+        }
+        break;
+      }
+
+      case 'right': {
+        if (this.state.currentPageNo < this.state.totalPages) {
+          const newPageNo = this.state.currentPageNo + 1;
+          this.setPageNo(newPageNo);
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
   }
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      list: nextProps.list ? nextProps.list : [],
-      listData: nextProps.list ? nextProps.list : []
+
+  setPageNo(pageNo) {
+    this.setState({ currentPageNo: pageNo }, () => {
+      this.updatePageNo(pageNo)
     });
   }
+
+  updatePageNo(no) {
+    if (no === 1) {
+      this.setState({ prevPageLimit: 0, currentPageLimit: 1 });
+    } else {
+      const page = no * this.state.perPage;
+      const prevPageLimit = page - this.state.perPage;
+      const currentPageLimit = page;
+
+      this.setState({ prevPageLimit, currentPageLimit });
+    }
+  }
+
   render() {
     return (
-      <div className="spreadsheet">
-        <div>
-          <div className="spreadsheet__copy">
-            {
-              this.state.list.length > 0 &&
-              <span className="spreadsheet__copy-len">
-                Total Pages: <strong>{parseInt(this.state.list.length / this.state.pageCountProp, 10) === 0 ? 1 : parseInt(this.state.list.length / this.state.pageCountProp, 10)}</strong>
-              </span>
-            }
-            {
-              this.props.upload &&
-              <div style={{ display: 'inline-block' }}>
-                <label
-                  htmlFor="file-upload"
-                  className="select-all sheet-btn"
-                  style={this.btnStyles()}
-                >
-                    Upload CSV
-                </label>
-                <input
-                  onChange={this.upload}
-                  id="file-upload"
-                  type="file"
-                />
-              </div>
-            }
-            {
-              (this.state.list.length > 0 && this.props.csv) &&
-              <div style={{ display: 'inline-block' }}>
-                <button
-                  className="csv__export-btn sheet-btn"
-                  onClick={this.fnExcelReport}
-                  style={this.btnStyles()}
-                >
-                  Download Full Table as CSV
-                </button>
-                <button
-                  onClick={() => this.toggleAllSelect('select')}
-                  className="select-all sheet-btn"
-                  style={this.btnStyles()}
-                >
-                  Copy all rows of page
-                </button>
-                <button
-                  onClick={() => this.toggleAllSelect('clear')}
-                  className="de-select sheet-btn"
-                  style={this.btnStyles()}
-                >
-                  De-select All
-                </button>
-              </div>
-            }
-            {
-              this.props.upload &&
-              <p className="nodata">
-                { this.state.csvError }
-              </p>
-            }
-          </div>
-          {
-            this.state.list.length > 0 &&
-            <div>
-              <div className="spreadsheet__table">
-                <Nav
-                  changePage={this.changePage}
-                  styles={this.btnStyles()}
-                  pageno={this.state.pageno}
-                />
-                <div className="table__wrapper">
-                  <table id="exl__table" className="exl__table">
-                    <thead className={`exl__table-thead ${this.props.theadStyle ? this.props.theadStyle : ''}`}>
-                      <tr>
-                        {
-                          (this.state.headers.length > 0) &&
-                          this.state.headers.map((val, index) => (
-                            <th key={index}>
-                              {val.headerName}
-                              {
-                                val.sort &&
-                                <div className="exl__table__sort">
-                                  <input className="exl__table__sort-input" type="text" onChange={(e) => this.setSort(e, val.mapKey)} mapkey={val.mapKey} />
-                                  <span className="exl__table__sort-error">{this.state[val.mapKey]}</span>
-                                </div>
-                              }
-                            </th>
-                          ))
-                        }
-                      </tr>
-                    </thead>
-                    <tbody className={`exl__table-tbody ${this.props.tbodyStyle ? this.props.tbodyStyle : ''}`}>
-                      { this.renderList() }
-                    </tbody>
-                  </table>
-                </div>
-                <Nav
-                  changePage={this.changePage}
-                  styles={this.btnStyles()}
-                  pageno={this.state.pageno}
-                />
-              </div>
-            </div>
-          }
-        </div>
-        {
-          !this.props.upload && this.state.list.length === 0 &&
-          <p className="nodata">
-            {this.state.msg}
-          </p>
-        }
+      <div>
+        <ul className="navStyle">
+          <li key="left">
+            <button className="navigateBtn" disabled={this.state.currentPageNo === 1} onClick={(e) => this.navigate('left')}>
+              &#x2190;
+            </button>
+          </li>
+
+          {this.pagination()}
+
+          <li key="right">
+            <button className="navigateBtn" disabled={this.state.currentPageNo === this.state.totalPages} onClick={(e) => this.navigate('right')}>
+              &#x2192;
+            </button>
+          </li>
+          <li className="download">
+            <button onClick={() => this.download('partial')}>
+              Download selected rows
+            </button>
+          </li>
+
+          <li className="download">
+            <button onClick={(e) => this.download('full')}>
+              Download Table
+            </button>
+          </li>
+        </ul>
+        <table className="tableStyle">
+          <thead><tr>{this.headers()}</tr></thead>
+          <tbody
+            className={this.props.zebraCross ? this.props.zebraCross === 'odd' ? "zebraOdd" : "zebraEven" : ''}
+          >
+            {this.rows()}
+          </tbody>
+        </table>
       </div>
     );
   }
 }
-
-Table.propTypes = {
-  list: PropTypes.array,
-  headers: PropTypes.array,
-  pageCount: PropTypes.number,
-  theadStyle: PropTypes.string,
-  tbodyStyle: PropTypes.string,
-  btnBg: PropTypes.string,
-  csv: PropTypes.bool,
-  upload: PropTypes.bool,
-  edited: PropTypes.func,
-  uniquekey: PropTypes.string,
-  filename: PropTypes.string,
-  doubleclick: PropTypes.func,
-};
 
 export default Table;

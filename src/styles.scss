@@ -1,0 +1,80 @@
+.tableStyle {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  border-spacing: 0;
+}
+
+.thStyle, .tdStyle {
+  text-align: left;
+  padding: 15px;
+  border: 1px solid #ccc;
+}
+
+.thStyle {
+  background: #0091EA;
+  color: #fff;
+}
+
+.navStyle {
+  width: 100%;
+  padding: 0 0 15px 0;
+  margin: 0;
+  height: 30px;
+  list-style: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pageNoLi {
+  width: 40px;
+  text-align: center;
+}
+
+.pageNoBtn, .navigateBtn {
+  background: transparent;
+  border: 1px solid #0091EA;
+  outline: none;
+  color: #0091EA;
+  cursor: pointer;
+  width: 30px;
+}
+
+.navigateBtn:disabled {
+  background: #ccc;
+  border-color: #ccc;
+  color: #959595;
+  cursor: not-allowed;;
+}
+
+.activePageNo {
+  background: #0091EA;
+  color: #fff;
+}
+
+.zebraOdd {
+  tr:nth-child(odd) {
+    background: #f5f5f5;
+  }
+}
+
+.zebraEven {
+  tr:nth-child(even) {
+    background: #f5f5f5;
+  }
+}
+
+.download {
+  padding-left: 15px;
+  button {
+    background: #0091EA;
+    color: #fff;
+    border: 1px solid #0091EA;
+    outline: none;
+    cursor: pointer;
+    &:hover {
+      box-shadow: 0 0 2px #0091EA;
+    }
+  }
+}
+
