@@ -1,10 +1,8 @@
 import React, { PureComponent } from 'react';
 import _property from 'lodash.property';
 import _map from 'lodash.map';
-import { AsyncParser } from 'json2csv';
+import Download from './download';
 import './styles.scss';
-
-let testFun = '';
 
 const PageNo = (props) => (
   <li className="pageNoLi">
@@ -74,69 +72,6 @@ class Table extends PureComponent {
     }
 
     this.setState({ selectedRow });
-  }
-
-  download(type) {
-    let downloadData = [];
-    const fields = this.props.headers.map((key) => (
-      {
-        label: key['headerName'],
-        value: key['mapKey'],
-        default: 'NULL'
-      }
-    ));
-    const opts = {
-      fields,
-      excelStrings: true,
-    };
-
-    const transformOpts = { highWaterMark: 8192 };
-    const asyncParser = new AsyncParser(opts, transformOpts);
-    let csv = '';
-
-    switch (type) {
-      case 'partial':
-        downloadData = [...this.state.selectedRow];
-        break;
-
-      case 'full':
-        downloadData = [...this.props.list];
-        break;
-
-      default:
-        downloadData = [];
-        break;
-    };
-
-    asyncParser.processor
-      .on('data', chunk => (csv += chunk.toString()))
-      .on('end', () => this.downloadFile(csv))
-      .on('error', err => console.error(err));
-
-    asyncParser.input.push(JSON.stringify(downloadData));
-    asyncParser.input.push(null);
-  }
-
-  downloadFile(csv) {
-    const exportedFilenmae = 'export.csv';
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-
-    if (navigator.msSaveBlob) { // IE 10+
-      navigator.msSaveBlob(blob, exportedFilenmae);
-    } else {
-      const link = document.createElement("a");
-
-      if (link.download !== undefined) { // feature detection
-        // Browsers that support HTML5 download attribute
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", exportedFilenmae);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    }
   }
 
   rows() {
@@ -268,6 +203,16 @@ class Table extends PureComponent {
     }
   }
 
+  downloadTemplate() {
+    return (
+      <Download
+        selectedRow={this.state.selectedRow}
+        currentPage={this.state.currentPage}
+        {...this.props}
+      />
+    );
+  }
+
   render() {
     return (
       <div>
@@ -285,17 +230,10 @@ class Table extends PureComponent {
               &#x2192;
             </button>
           </li>
-          <li className="download">
-            <button onClick={() => this.download('partial')}>
-              Download selected rows
-            </button>
-          </li>
-
-          <li className="download">
-            <button onClick={(e) => this.download('full')}>
-              Download Table
-            </button>
-          </li>
+          {
+            (this.props.downloadRows || this.props.downloadPage || this.props.downloadTable) &&
+            this.downloadTemplate()
+          }
         </ul>
         <table className="tableStyle">
           <thead><tr>{this.headers()}</tr></thead>
