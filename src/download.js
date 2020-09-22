@@ -33,7 +33,7 @@ const Download = (props) => {
         props.downloadRows &&
         <li className="download">
           <button onClick={() => download('partial')}>
-            Download Selected Rows
+            Download Selected Rows hello
             </button>
         </li>
       }
