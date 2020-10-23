@@ -16,7 +16,7 @@ const Download = (props) => {
         break;
 
       case 'full':
-        downloadData = [...props.list];
+        downloadData = [...props.fullList];
         break;
 
       default:
@@ -33,7 +33,7 @@ const Download = (props) => {
         props.downloadRows &&
         <li className="download">
           <button onClick={() => download('partial')}>
-            Download Selected Rows hello
+            Download Selected Rows
             </button>
         </li>
       }
@@ -50,7 +50,7 @@ const Download = (props) => {
         <li className="download">
           <button onClick={(e) => download('full')}>
             Download Table
-            </button>
+          </button>
         </li>
       }
     </Fragment>

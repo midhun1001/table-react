@@ -1,3 +1,10 @@
+.csvTableContainer {
+  position: relative;
+  width: 100%;
+  height: inherit;
+  overflow: auto;
+}
+
 .tableStyle {
   width: 100%;
   border-collapse: collapse;
@@ -5,7 +12,8 @@
   border-spacing: 0;
 }
 
-.thStyle, .tdStyle {
+.thStyle,
+.tdStyle {
   text-align: left;
   padding: 15px;
   border: 1px solid #ccc;
@@ -27,24 +35,25 @@
 }
 
 .pageNoLi {
-  width: 40px;
   text-align: center;
 }
 
-.pageNoBtn, .navigateBtn {
+.pageNoBtn,
+.navigateBtn {
   background: transparent;
   border: 1px solid #0091EA;
   outline: none;
   color: #0091EA;
   cursor: pointer;
-  width: 30px;
+  min-width: 50px;
 }
 
 .navigateBtn:disabled {
   background: #ccc;
   border-color: #ccc;
   color: #959595;
-  cursor: not-allowed;;
+  cursor: not-allowed;
+  ;
 }
 
 .activePageNo {
@@ -66,15 +75,93 @@
 
 .download {
   padding-left: 15px;
+
   button {
     background: #0091EA;
     color: #fff;
     border: 1px solid #0091EA;
     outline: none;
     cursor: pointer;
+
     &:hover {
       box-shadow: 0 0 2px #0091EA;
     }
   }
 }
 
+.perPage {
+  margin-right: 15px;
+  width: 50px;
+  border: 0;
+  border-bottom: 1px solid #0091EA;
+  outline: none;
+}
+
+.goToPage {
+  outline: none;
+  border: 0;
+  border-bottom: 1px solid #0091EA;
+  width: 50px;
+  margin-right: 15px;
+  text-align: center;
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.navLabel {
+  font-size: 12px;
+  padding-right: 15px;
+}
+
+.spinner {
+  border: 5px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 5px solid #3498db;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 30%;
+  left: calc(50% - 12.5px);
+  -webkit-animation: spin 2s linear infinite;
+  /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.trActive {
+  cursor: pointer;
+}
+
+.sortIcon {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 10px;
+  padding: 0 0 0 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

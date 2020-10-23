@@ -26,57 +26,136 @@ class Table extends PureComponent {
       currentPageLimit: 1,
       currentPage: [],
       currentPageNo: 1,
-      selectedRow: []
+      selectedRow: [],
+      goToPage: 1,
+      list: [],
+      sortCode: '',
+      loading: false
     };
 
     this.setPageNo = this.setPageNo.bind(this);
   }
 
   componentDidMount() {
-    this.setCurrentPage();
-    const totalPages = Math.ceil(this.props.list.length / this.state.perPage);
-    this.setState({ totalPages });
+    const totalPages = Math.ceil(this.state.list.length / this.state.perPage);
+
+    this.setState({ totalPages }, () => {
+      this.setCurrentPage();
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
+    if (prevProps.list !== this.props.list) {
+      this.setState({ list: this.props.list }, () => {
+        this.setCurrentPage();
+      });
+    }
     if ((prevState.prevPageLimit !== this.state.prevPageLimit)
       || (prevState.perPage !== this.state.perPage)) {
       this.setCurrentPage();
     }
+
+    if (prevProps.loading === this.props.loading) {
+      this.setState({ loading: this.props.loading });
+    }
   }
 
   setCurrentPage() {
-    const list = [...this.props.list];
+    let list = [...this.state.list];
     const currentPage = list.splice(this.state.prevPageLimit, this.state.perPage);
+    const totalPages = Math.ceil(this.state.list.length / this.state.perPage);
 
-    this.setState({ currentPage });
+    this.setState({ currentPage, totalPages });
+  }
+
+  sortTable() {
+    this.setState({ loading: true }, () => {
+      const list = [...this.props.list];
+
+      list.sort((a, b) => {
+
+        if (typeof b[this.state.sortCode] === 'string' || typeof a[this.state.sortCode] === 'string') {
+          if (b[this.state.sortCode] > a[this.state.sortCode]) {
+            return -1
+          }
+
+          if (b[this.state.sortCode] < a[this.state.sortCode]) {
+            return 1
+          }
+
+          return 0;
+        } else if (typeof b[this.state.sortCode] === 'number' || typeof a[this.state.sortCode] === 'number') {
+
+          return b[this.state.sortCode] - a[this.state.sortCode];
+        }
+
+        return 0;
+      });
+      this.setState({ list, loading: false }, () => {
+        this.setCurrentPage();
+      });
+    });
+  }
+
+  setSortOrder(field) {
+    if (this.state.sortCode !== field) {
+      this.setState({
+        sortCode: field,
+        prevPageLimit: 0,
+        currentPageLimit: 1,
+        currentPageNo: 1,
+        goToPage: 1,
+      }, () => {
+        this.sortTable();
+      });
+    } else {
+      this.setState({
+        sortCode: '',
+        list: this.props.list
+      }, () => {
+        this.setCurrentPage();
+      });
+    }
   }
 
   headers() {
     return this.props.headers.map((header, i) => (
-      <th key={i} className="thStyle">{header.headerName}</th>
+      <th key={i} className="thStyle">
+        {header.headerName}
+        <button className="sortIcon" onClick={(e) => this.setSortOrder(header.mapKey)}>
+          {
+            this.state.sortCode === header.mapKey ? '∧' : '∨'
+          }
+        </button>
+      </th>
     ));
   };
 
   selectRow(e, row) {
-    const selectedRow = [...this.state.selectedRow];
+    if (this.props.downloadRows) {
+      const selectedRow = [...this.state.selectedRow];
 
-    if (!selectedRow.includes(row)) {
-      e.currentTarget.style.background = '#e0f3fe';
-      selectedRow.push(row);
-    } else {
-      const index = selectedRow.indexOf(row);
+      if (!selectedRow.includes(row)) {
+        e.currentTarget.style.background = '#e0f3fe';
+        selectedRow.push(row);
+      } else {
+        const index = selectedRow.indexOf(row);
 
-      selectedRow.splice(index, 1);
-      e.currentTarget.style.background = '';
+        selectedRow.splice(index, 1);
+        e.currentTarget.style.background = '';
+      }
+
+      this.setState({ selectedRow });
     }
-
-    this.setState({ selectedRow });
   }
 
   rows() {
     return this.state.currentPage.map((row, i) => (
-      <tr key={i} onClick={(e) => this.selectRow(e, row)}>
+      <tr
+        className={this.props.downloadRows ? 'trActive' : ''}
+        key={i} onClick={(e) => this.selectRow(e, row)}
+        title={`Record No. ${i + 1}`}
+      >
         {
           this.props.headers.map((key, i) => {
             const mapKey = key['mapKey'];
@@ -208,43 +287,112 @@ class Table extends PureComponent {
       <Download
         selectedRow={this.state.selectedRow}
         currentPage={this.state.currentPage}
+        fullList={this.state.list}
         {...this.props}
       />
     );
   }
 
+  pageCount() {
+    const count = this.state.list.length > 100 ? 100 : this.state.list.length;
+    const option = [];
+    let i = 0;
+
+    while (i < count) {
+      option.push(
+        <option value={i + 10}>{i + 10}</option>
+      );
+
+      i += 10;
+    }
+
+    return option;
+  }
+
+  setPerPageCount(e) {
+    this.setState({
+      perPage: e.target.value,
+      currentPageNo: 1,
+      goToPage: 1
+    }, () => {
+      this.updatePageNo(1);
+    });
+  }
+
+  goToPage(e) {
+    let pageNo = e.target.value;
+    pageNo = pageNo.length > 0 ? parseInt(pageNo, 10) : pageNo;
+
+    this.setState({ goToPage: pageNo }, () => {
+      if (pageNo >= 1 && pageNo <= this.state.totalPages) {
+        this.setPageNo(pageNo);
+      }
+    });
+  }
+
+  blurGoToPage() {
+    if (this.state.goToPage.length === 0) {
+      this.setState({ goToPage: this.state.currentPageNo });
+    }
+  }
+
   render() {
-    return (
-      <div>
-        <ul className="navStyle">
-          <li key="left">
-            <button className="navigateBtn" disabled={this.state.currentPageNo === 1} onClick={(e) => this.navigate('left')}>
-              &#x2190;
-            </button>
-          </li>
+    if (this.state.loading) {
+      return (
+        <div className="csvTableContainer">
+          <div className="spinner" />
+        </div>
+      );
+    }
 
-          {this.pagination()}
+    if (this.state.list && this.state.list.length > 0) {
+      return (
+        <div className="csvTableContainer">
+          <ul className="navStyle">
+            {
+              this.props.goToPage &&
+              <li>
+                <label className="navLabel">Goto</label>
+                <input className="goToPage" onBlur={() => this.blurGoToPage()} type="number" min={1} value={this.state.goToPage} onChange={(e) => this.goToPage(e)} />
+              </li>
+            }
+            <li>
+              <label className="navLabel">Show</label>
+              <select className="perPage" onChange={(e) => this.setPerPageCount(e)}>
+                {this.pageCount()}
+              </select>
+            </li>
+            <li key="left">
+              <button className="navigateBtn" disabled={this.state.currentPageNo === 1} onClick={(e) => this.navigate('left')}>
+                &#x2190;
+              </button>
+            </li>
 
-          <li key="right">
-            <button className="navigateBtn" disabled={this.state.currentPageNo === this.state.totalPages} onClick={(e) => this.navigate('right')}>
-              &#x2192;
-            </button>
-          </li>
-          {
-            (this.props.downloadRows || this.props.downloadPage || this.props.downloadTable) &&
-            this.downloadTemplate()
-          }
-        </ul>
-        <table className="tableStyle">
-          <thead><tr>{this.headers()}</tr></thead>
-          <tbody
-            className={this.props.zebraCross ? this.props.zebraCross === 'odd' ? "zebraOdd" : "zebraEven" : ''}
-          >
-            {this.rows()}
-          </tbody>
-        </table>
-      </div>
-    );
+            {this.pagination()}
+
+            <li key="right">
+              <button className="navigateBtn" disabled={this.state.currentPageNo === this.state.totalPages} onClick={(e) => this.navigate('right')}>
+                &#x2192;
+              </button>
+            </li>
+            {
+              (this.props.downloadRows || this.props.downloadPage || this.props.downloadTable) &&
+              this.downloadTemplate()
+            }
+          </ul>
+          <table className="tableStyle">
+            <thead><tr>{this.headers()}</tr></thead>
+            <tbody
+              className={this.props.zebraCross ? this.props.zebraCross === 'odd' ? "zebraOdd" : "zebraEven" : ''}
+            >
+              {this.rows()}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    return null;
   }
 }
 
