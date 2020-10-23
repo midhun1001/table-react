@@ -131,18 +131,16 @@ class Table extends PureComponent {
     ));
   };
 
-  selectRow(e, row) {
+  selectRow(row) {
     if (this.props.downloadRows) {
       const selectedRow = [...this.state.selectedRow];
 
       if (!selectedRow.includes(row)) {
-        e.currentTarget.style.background = '#e0f3fe';
         selectedRow.push(row);
       } else {
         const index = selectedRow.indexOf(row);
 
         selectedRow.splice(index, 1);
-        e.currentTarget.style.background = '';
       }
 
       this.setState({ selectedRow });
@@ -153,8 +151,9 @@ class Table extends PureComponent {
     return this.state.currentPage.map((row, i) => (
       <tr
         className={this.props.downloadRows ? 'trActive' : ''}
-        key={i} onClick={(e) => this.selectRow(e, row)}
-        title={`Record No. ${i + 1}`}
+        key={i} onClick={(e) => this.selectRow(row)}
+        title={`Row No. ${i + 1}`}
+        style={this.state.selectedRow.includes(row) ? { background: '#e0f3fe' } : { background: '' }}
       >
         {
           this.props.headers.map((key, i) => {
