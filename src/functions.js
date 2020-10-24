@@ -27,7 +27,7 @@ export const readyForDownload = (type, headers, data, filename) => {
 };
 
 const downloadFile = (csv, filename) => {
-  const exportedFilenmae = `${filename}.csv`;
+  const exportedFilenmae = filename ? `${filename}.csv` : 'export.csv';
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
   if (navigator.msSaveBlob) { // IE 10+
