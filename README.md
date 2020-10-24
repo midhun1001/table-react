@@ -46,13 +46,6 @@ import Table from "csv-react-table";
       </td>
     </tr>
     <tr>
-      <td>pageCount</td>
-      <td>
-        <p><strong>Optional. Type: Number</strong></p>
-        Value can be any number. Default value is 10
-      </td>
-    </tr>
-    <tr>
       <td>headers</td>
       <td>
         <p><strong>Mandatory. Type: Array object</strong></p>
@@ -74,83 +67,48 @@ import Table from "csv-react-table";
       </td>
     </tr>
     <tr>
-      <td>theadStyle</td>
-      <td>
-          <p><strong>Optional. Type: String</strong></p>
-          <p>
-            Pass the className to alter the styles of thead
-          </p>
-          <pre>
-            <strong>Example</strong>
-            .headerStyle {
-              tr {
-                background: #E57373;
-                th {
-                  padding: 5px 10px
-                }
-              }
-            }
-          </pre>
-      </td>
-    </tr>
-    <tr>
-      <td>tbodyStyle</td>
-      <td>
-          <p><strong>Optional. Type: String</strong></p>
-          <p>
-            Pass the className to alter the styles of tbody
-          </p>
-          <pre>
-            <strong>Example</strong>
-            .bodyStyle {
-              tr {
-                background: #8e8e8e;
-                color: #fff;
-                td {
-                  padding: 5px;
-                }
-              }
-            }
-          </pre>
-      </td>
-    </tr>
-    <tr>
-      <td>btnBg</td>
-      <td>
-          <p><strong>Optional. Type: String</strong></p>
-          <p>
-            Pass the color to change the color of the buttons
-          </p>
-      </td>
-    </tr>
-    <tr>
-      <td>csv</td>
+      <td>goToPage</td>
       <td>
           <p><strong>Optional. Type: Boolean</strong></p>
           <p>
-            To enable the functionality download as csv file and to activate copy the rows in csv format
+            Navigate to a particular page
           </p>
       </td>
     </tr>
     <tr>
-      <td>edited</td>
+      <td>downloadTable</td>
       <td>
-          <p><strong>Optional. Type: Function</strong></p>
+          <p><strong>Optional. Type: Boolean</strong></p>
           <p>
-            Callback function to get the editable row data in json format.
-            Double click the column to edit it's content
-            <strong>Note: edited prop should pass in order to activate inline editing</strong>
+            To download whole table as csv file
           </p>
       </td>
     </tr>
     <tr>
-      <td>upload</td>
+      <td>downloadRows</td>
       <td>
-          <p><strong>Optional. Type: Boolean </strong></p>
+          <p><strong>Optional. Type: Boolean</strong></p>
           <p>
-            To enable csv file upload.
+             To download selected rows as a csv file
           </p>
-          <p><strong>Note: First line will be considered as Header.</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td>downloadPage</td>
+      <td>
+          <p><strong>Optional. Type: Boolean</strong></p>
+          <p>
+             To download the current as a csv file
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>zebraCross</td>
+      <td>
+          <p><strong>Optional. Type: String</strong></p>
+          <p>
+            Zebra effect. Default value: none. Expected values: 'even' or 'odd'
+          </p>
       </td>
     </tr>
     <tr>
@@ -158,9 +116,167 @@ import Table from "csv-react-table";
       <td>
           <p><strong>Optional. Type: String </strong></p>
           <p>
-            NAme given to file for download.
+            Name given to file for download.
           </p>
-          <p><strong>Note: Give name without extension</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td>downloadButtonStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for download buttons
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>downloadButtonClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for download buttons
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>paginationStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for pagination component
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>paginationClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for pagination component
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>activePageNumberClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Styles of current page number in the pagination component
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>tableHeadStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for table header(thead)
+          </p>
+      </td>
+    </tr>
+    <tr>
+    <tr>
+      <td>tableHeadClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for table header(thead)
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>tableHeadRowStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for tr inside table head(thead>tr)
+          </p>
+      </td>
+    </tr>
+    <tr>
+    <tr>
+      <td>tableHeadRowClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for tr inside table head(thead>tr)
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>tableHeadColumnStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for th inside table head(thead>tr>th)
+          </p>
+      </td>
+    </tr>
+    <tr>
+    <tr>
+      <td>tableHeadColumnClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for th inside table head(thead>tr>th)
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>tableBodyStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for tbody inside table head(tbody)
+          </p>
+      </td>
+    </tr>
+    <tr>
+    <tr>
+      <td>tableBodyClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for for tbody inside table head(tbody)
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>tableRowStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for tr inside table body(tbody>tr)
+          </p>
+      </td>
+    </tr>
+    <tr>
+    <tr>
+      <td>tableRowClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for tr inside table body(tbody>tr)
+          </p>
+      </td>
+    </tr>
+    <tr>
+      <td>tableColumnStyle</td>
+      <td>
+          <p><strong>Optional. Type: Object </strong></p>
+          <p>
+            Custom styles for td inside table body(tbody>tr>td)
+          </p>
+      </td>
+    </tr>
+    <tr>
+    <tr>
+      <td>tableRowClass</td>
+      <td>
+          <p><strong>Optional. Type: String </strong></p>
+          <p>
+            Custom class names for td inside table body(tbody>tr>td)
+          </p>
       </td>
     </tr>
   </tbody>
