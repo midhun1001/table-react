@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 
 const Download = (props) => {
   const readyForDownload = require('./functions').readyForDownload;
@@ -24,36 +24,48 @@ const Download = (props) => {
         break;
     };
 
-    readyForDownload(type, props.headers, downloadData);
+    readyForDownload(type, props.headers, downloadData, props.filename);
   };
 
   return (
-    <Fragment>
+    <ul>
       {
         props.downloadRows &&
         <li className="download">
-          <button onClick={() => download('partial')}>
-            Download Selected Rows
-            </button>
+          <button
+            style={props.downloadButtonStyle || {}}
+            className={`${props.downloadButtonClass || 'downloadButton'}`}
+            onClick={() => download('partial')}
+          >
+            Download Rows
+          </button>
         </li>
       }
       {
         props.downloadPage &&
         <li className="download">
-          <button onClick={(e) => download('page')}>
+          <button
+            style={props.downloadButtonStyle || {}}
+            className={`${props.downloadButtonClass || 'downloadButton'}`}
+            onClick={(e) => download('page')}
+          >
             Download Page
-            </button>
+          </button>
         </li>
       }
       {
         props.downloadTable &&
         <li className="download">
-          <button onClick={(e) => download('full')}>
+          <button
+            style={props.downloadButtonStyle || {}}
+            className={`${props.downloadButtonClass || 'downloadButton'}`}
+            onClick={(e) => download('full')}
+          >
             Download Table
           </button>
         </li>
       }
-    </Fragment>
+    </ul>
   );
 };
 

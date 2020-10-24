@@ -4,16 +4,39 @@ import _map from 'lodash.map';
 import Download from './download';
 import './styles.scss';
 
-const PageNo = (props) => (
-  <li className="pageNoLi">
-    <button
-      className={`pageNoBtn ${props.pageNo === props.currentPageNo ? 'activePageNo' : ''}`}
-      onClick={() => props.callBack ? props.callBack(props.pageNo) : ''}
-    >
-      {props.pageNo}
-    </button>
-  </li>
-);
+const PageNo = (props) => {
+  const getClassNames = () => {
+    let className = '';
+
+    if (props.classNames) {
+      className = props.classNames;
+    } else {
+      className = 'pageNoBtn';
+    }
+
+    if (props.pageNo === props.currentPageNo) {
+      if (props.activePageNumber) {
+        className += ` ${props.activePageNumber}`;
+      } else {
+        className += ' activePageNo';
+      }
+    }
+
+    return className;
+  };
+
+  return (
+    <li className="pageNoLi">
+      <button
+        style={props.style || {}}
+        className={getClassNames()}
+        onClick={() => props.callBack ? props.callBack(props.pageNo) : ''}
+      >
+        {props.pageNo}
+      </button>
+    </li>
+  )
+};
 
 class Table extends PureComponent {
   constructor(props) {
@@ -120,7 +143,11 @@ class Table extends PureComponent {
 
   headers() {
     return this.props.headers.map((header, i) => (
-      <th key={i} className="thStyle">
+      <th
+        key={i}
+        className={this.props.tableHeadColumnClass || 'thStyle'}
+        style={this.props.tableHeadColumnStyle || {}}
+      >
         {header.headerName}
         <button className="sortIcon" onClick={(e) => this.setSortOrder(header.mapKey)}>
           {
@@ -147,13 +174,39 @@ class Table extends PureComponent {
     }
   }
 
+  getTableRowClass() {
+    let className = this.props.downloadRows ? 'trActive' : '';
+
+    if (this.props.tableRowClass) {
+      className += ` ${this.props.tableRowClass || ''}`
+    }
+
+    return className;
+  }
+
+  getTableRowStyle(row) {
+    let style = {};
+
+    if (this.state.selectedRow.includes(row)) {
+      style.background = '#e0f3fe';
+    } else {
+      style.background = '';
+    }
+
+    if (this.props.tableRowStyle) {
+      style = Object.assign({}, style, this.props.tableRowStyle);
+    }
+
+    return style;
+  }
+
   rows() {
     return this.state.currentPage.map((row, i) => (
       <tr
-        className={this.props.downloadRows ? 'trActive' : ''}
+        className={this.getTableRowClass()}
         key={i} onClick={(e) => this.selectRow(row)}
         title={`Row No. ${i + 1}`}
-        style={this.state.selectedRow.includes(row) ? { background: '#e0f3fe' } : { background: '' }}
+        style={this.getTableRowStyle(row)}
       >
         {
           this.props.headers.map((key, i) => {
@@ -162,7 +215,8 @@ class Table extends PureComponent {
             return (
               <td
                 key={i}
-                className="tdStyle"
+                className={this.props.tableColumnClass || 'tdStyle'}
+                style={this.props.tableColumnStyle || {}}
               >
                 {row[mapKey]}
               </td>
@@ -180,58 +234,58 @@ class Table extends PureComponent {
       if (this.state.totalPages <= 5) {
         for (let i = 0; i < this.state.totalPages; i += 1) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={i} pageNo={i + 1} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={i} pageNo={i + 1} callBack={this.setPageNo} />
           );
         }
       } else {
         if (this.state.currentPageNo > 1) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={1} pageNo={1} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={1} pageNo={1} callBack={this.setPageNo} />
           );
         }
 
         if (this.state.currentPageNo >= this.state.totalPages - 1) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={2} pageNo={2} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={2} pageNo={2} callBack={this.setPageNo} />
           );
         }
 
         if (this.state.currentPageNo > 2) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={'1...'} pageNo={'...'} callBack={null} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={'1...'} pageNo={'...'} callBack={null} />
           );
         }
 
         if (this.state.currentPageNo === this.state.totalPages) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={this.state.totalPages - 1} pageNo={this.state.totalPages - 1} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={this.state.totalPages - 1} pageNo={this.state.totalPages - 1} callBack={this.setPageNo} />
           );
         }
 
         pages.push(
-          <PageNo currentPageNo={this.state.currentPageNo} key={this.state.currentPageNo} pageNo={this.state.currentPageNo} callBack={this.setPageNo} />
+          <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={this.state.currentPageNo} pageNo={this.state.currentPageNo} callBack={this.setPageNo} />
         );
 
         if (this.state.currentPageNo === 1) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={2} pageNo={2} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={2} pageNo={2} callBack={this.setPageNo} />
           );
         }
 
         if (this.state.currentPageNo < (this.state.totalPages - 1)) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={'2...'} pageNo={'...'} callBack={null} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={'2...'} pageNo={'...'} callBack={null} />
           );
         }
         if (this.state.currentPageNo < 3) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={this.state.totalPages - 1} pageNo={this.state.totalPages - 1} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={this.state.totalPages - 1} pageNo={this.state.totalPages - 1} callBack={this.setPageNo} />
           );
         }
 
         if (this.state.currentPageNo < this.state.totalPages) {
           pages.push(
-            <PageNo currentPageNo={this.state.currentPageNo} key={this.state.totalPages} pageNo={this.state.totalPages} callBack={this.setPageNo} />
+            <PageNo activePageNumber={this.props.activePageNumberClass || ''} classNames={this.props.paginationClass || ''} style={this.props.paginationStyle || {}} currentPageNo={this.state.currentPageNo} key={this.state.totalPages} pageNo={this.state.totalPages} callBack={this.setPageNo} />
           );
         }
       }
@@ -335,6 +389,13 @@ class Table extends PureComponent {
     }
   }
 
+  getTableBodyClass() {
+    let className = this.props.zebraCross ? this.props.zebraCross === 'odd' ? "zebraOdd" : "zebraEven" : '';
+    className += ` ${this.props.tableBodyClass || ''}`;
+
+    return className;
+  }
+
   render() {
     if (this.state.loading) {
       return (
@@ -361,32 +422,53 @@ class Table extends PureComponent {
                 {this.pageCount()}
               </select>
             </li>
-            <li key="left">
-              <button className="navigateBtn" disabled={this.state.currentPageNo === 1} onClick={(e) => this.navigate('left')}>
-                &#x2190;
-              </button>
+
+            <li>
+              <ul>
+                <li key="left">
+                  <button className="navigateBtn" disabled={this.state.currentPageNo === 1} onClick={(e) => this.navigate('left')}>
+                    &#x2190;
+                  </button>
+                </li>
+
+                {this.pagination()}
+
+                <li key="right">
+                  <button className="navigateBtn" disabled={this.state.currentPageNo === this.state.totalPages} onClick={(e) => this.navigate('right')}>
+                    &#x2192;
+                  </button>
+                </li>
+              </ul>
             </li>
 
-            {this.pagination()}
-
-            <li key="right">
-              <button className="navigateBtn" disabled={this.state.currentPageNo === this.state.totalPages} onClick={(e) => this.navigate('right')}>
-                &#x2192;
-              </button>
+            <li>
+              {
+                (this.props.downloadRows || this.props.downloadPage || this.props.downloadTable) &&
+                this.downloadTemplate()
+              }
             </li>
-            {
-              (this.props.downloadRows || this.props.downloadPage || this.props.downloadTable) &&
-              this.downloadTemplate()
-            }
           </ul>
-          <table className="tableStyle">
-            <thead><tr>{this.headers()}</tr></thead>
-            <tbody
-              className={this.props.zebraCross ? this.props.zebraCross === 'odd' ? "zebraOdd" : "zebraEven" : ''}
-            >
-              {this.rows()}
-            </tbody>
-          </table>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="tableStyle">
+              <thead
+                style={this.props.tableHeadStyle || {}}
+                className={this.props.tableHeadClass || ''}
+              >
+                <tr
+                  className={this.props.tableHeadRowClass || 'thStyle'}
+                  style={this.props.tableHeadRowStyle || {}}
+                >
+                  {this.headers()}
+                </tr>
+              </thead>
+              <tbody
+                style={this.props.tableBodyStyle || {}}
+                className={this.getTableBodyClass()}
+              >
+                {this.rows()}
+              </tbody>
+            </table>
+          </div>
         </div>
       );
     }

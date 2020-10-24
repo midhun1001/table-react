@@ -1,6 +1,6 @@
 import { AsyncParser } from 'json2csv';
 
-export const readyForDownload = (type, headers, data) => {
+export const readyForDownload = (type, headers, data, filename) => {
   const fields = headers.map((key) => (
     {
       label: key['headerName'],
@@ -19,15 +19,15 @@ export const readyForDownload = (type, headers, data) => {
 
   asyncParser.processor
     .on('data', chunk => (csv += chunk.toString()))
-    .on('end', () => downloadFile(csv))
+    .on('end', () => downloadFile(csv, filename))
     .on('error', err => console.error(err));
 
   asyncParser.input.push(JSON.stringify(data));
   asyncParser.input.push(null);
 };
 
-const downloadFile = (csv) => {
-  const exportedFilenmae = 'export.csv';
+const downloadFile = (csv, filename) => {
+  const exportedFilenmae = `${filename}.csv`;
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
   if (navigator.msSaveBlob) { // IE 10+
