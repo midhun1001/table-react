@@ -97,7 +97,7 @@ import Table from "csv-react-table";
       <td>
           <p><strong>Optional. Type: Boolean</strong></p>
           <p>
-             To download the current as a csv file
+             To download the current page as a csv file
           </p>
       </td>
     </tr>
