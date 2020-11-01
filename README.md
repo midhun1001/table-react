@@ -1,7 +1,7 @@
 <h2>React Table</h2>
 
 <h4>
-Light weight simple react table where you have the option to download only rows which is need or you can download a particular or else you can download the entore table as csv file.
+Light weight simple react table where you have the option to download only rows which is need or you can download a particular or else you can download the entire table as csv file.
 <h3>Demo: https://codesandbox.io/s/k5kq105337</h3>
 
 <p>npm install csv-react-table</p>
