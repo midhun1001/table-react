@@ -1,6 +1,6 @@
 {
   "name": "csv-react-table",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "main": "build/index.js",
   "repository": "https://github.com/midhun1001/table-react.git",
   "author": "Midhun Murali",
@@ -38,11 +38,10 @@
   "keywords": [
     "table",
     "react table",
-    "spreadsheet",
-    "edit table",
     "react",
     "react-component",
-    "excel",
+    "csv",
+    "download table",
     "ui",
     "front-end"
   ]
